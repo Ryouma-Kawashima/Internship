@@ -7,7 +7,8 @@
 - 機能と結果の保証をする
 
 # 構想図(未完成)
-● Main
+※ RawかBlameでキレイに表示されます
+* Main
 | + Window
 | | + OS / Windows
 | | + OS / Linux
@@ -33,14 +34,14 @@
 | | | + 
 
 
-● Window
+* Window
 | + Base
 | | + virtual bool Create(uint32_t width, uint32_t, height, void** handle)
 | | + virutal void Destroy()
 | | + virtual void Show(bool isShow)
 | | + virtual bool Update() /* 戻り値がtrueだったら終了処理 */
 
-● Render
+* Render
 | + Base
 | | + virtual void CreateDevice(void* handle)
 | | + virtual void DestroyDevice()
@@ -50,7 +51,7 @@
 | | + void Draw()
 | 
 
-● Timer
+* Timer
 | + void Start()
 | + void Stop()
 | + uint32_t GetElapsedTime()
