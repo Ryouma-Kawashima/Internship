@@ -7,7 +7,7 @@
 - 機能と結果の保証をする
 
 # 構想図(未完成)
-※ RawかBlameでキレイに表示されます
+※ Rawでキレイに表示されます
 * Main
 | + Window
 | | + OS / Windows
