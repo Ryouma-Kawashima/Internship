@@ -53,9 +53,8 @@
 * Timer
 | + void Start()
 | + void Stop()
+| + uint32_t GetElapsedTime()
 
 ※ Rawでキレイに表示されます
 
 
-
-| + uint32_t GetElapsedTime()
