@@ -7,7 +7,6 @@
 - 機能と結果の保証をする
 
 # 構想図(未完成)
-※ Rawでキレイに表示されます
 * Main
 | + Window
 | | + OS / Windows
@@ -54,4 +53,9 @@
 * Timer
 | + void Start()
 | + void Stop()
+
+※ Rawでキレイに表示されます
+
+
+
 | + uint32_t GetElapsedTime()
