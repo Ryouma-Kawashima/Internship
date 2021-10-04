@@ -15,9 +15,9 @@ int DragonLib::DebugPrintf(const char* format, ...)
 {
 #if defined(_DEBUG) || defined(DEBUG)
 
-	size_t	len = 0;
-	char* buf = NULL;
-	va_list ap = NULL;
+	size_t	len	= 0;
+	char*	buf	= NULL;
+	va_list	ap	= NULL;
 
 	va_start(ap, format);
 	len = _vscprintf(format, ap) + 1;		// •ÏŠ·Œã‚Ì’·‚³‚ðŽæ“¾(\0‚ªŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢‚Ì‚Å+1)
