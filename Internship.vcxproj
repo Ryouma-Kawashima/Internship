@@ -146,29 +146,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main\main.cpp" />
-    <ClCompile Include="main\main_windows.cpp" />
-    <ClCompile Include="utility\debug_printf.cpp" />
-    <ClCompile Include="utility\timer.cpp" />
-    <ClCompile Include="window\auto_switch.cpp" />
-    <ClCompile Include="window\window_base.cpp" />
-    <ClCompile Include="window\window_windows.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="main\main.h" />
-    <ClInclude Include="main\main_windows.h" />
-    <ClInclude Include="render\render.h" />
-    <ClInclude Include="system\config.h" />
-    <ClInclude Include="utility\accessor.h" />
-    <ClInclude Include="utility\debug_printf.h" />
-    <ClInclude Include="utility\params.h" />
-    <ClInclude Include="utility\singleton.h" />
-    <ClInclude Include="utility\timer.h" />
-    <ClInclude Include="window\auto_switch.h" />
-    <ClInclude Include="window\window_base.h" />
-    <ClInclude Include="window\window_windows.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
