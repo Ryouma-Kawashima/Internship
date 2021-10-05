@@ -1,4 +1,69 @@
 ﻿  main.cpp
-  timer.cpp
+C:\Users\rrisland\Documents\GitHub\Internship\system\main.cpp(13,14): error C2731: 'wWinMain': 関数はオーバーロードできません。
+C:\Users\rrisland\Documents\GitHub\Internship\system\main.cpp(13): message : 'wWinMain' の宣言を確認してください
+  multi_timer.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xmemory(714,47): error C2665: 'std::pair<const std::string,DragonLib::Timer>::pair': 2 オーバーロードのどれも、すべての引数の型を変換できませんでした
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\utility(213,5): message : 'std::pair<const std::string,DragonLib::Timer>::pair(std::pair<const std::string,DragonLib::Timer> &&)' の可能性があります
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\utility(212,5): message : または 'std::pair<const std::string,DragonLib::Timer>::pair(const std::pair<const std::string,DragonLib::Timer> &)'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xmemory(707,1): message : 引数リスト '(std::string)' を一致させようとしているとき
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtree(811): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::string&>(_Alloc &,_Objty *const ,std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,DragonLib::Timer>>>::void_pointer>>,
+              _Ty=std::pair<const std::string,DragonLib::Timer>,
+              _Objty=std::pair<const std::string,DragonLib::Timer>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtree(812): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::string&>(_Alloc &,_Objty *const ,std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,DragonLib::Timer>>>::void_pointer>>,
+              _Ty=std::pair<const std::string,DragonLib::Timer>,
+              _Objty=std::pair<const std::string,DragonLib::Timer>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtree(1007): message : コンパイル対象の関数 テンプレート インスタンス化 'std::_Tree_temp_node<std::allocator<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<_Alloc>::void_pointer>>>::_Tree_temp_node<std::string&>(_Alnode &,std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,DragonLib::Timer>>,
+              _Alnode=std::allocator<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,DragonLib::Timer>>>::void_pointer>>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtree(1023): message : コンパイル対象の関数 テンプレート インスタンス化 'std::_Tree_temp_node<std::allocator<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<_Alloc>::void_pointer>>>::_Tree_temp_node<std::string&>(_Alnode &,std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,DragonLib::Timer>>,
+              _Alnode=std::allocator<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,DragonLib::Timer>>>::void_pointer>>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtree(1044): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::_Emplace<std::string&>(std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,DragonLib::Timer>>,
+              _Kty=std::string,
+              _Ty=DragonLib::Timer,
+              _Pr=std::less<std::string>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtree(1045): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_node<std::pair<const std::string,DragonLib::Timer>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::_Emplace<std::string&>(std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,DragonLib::Timer>>,
+              _Kty=std::string,
+              _Ty=DragonLib::Timer,
+              _Pr=std::less<std::string>
+          ]
+C:\Users\rrisland\Documents\GitHub\Internship\utility\multi_timer.cpp(11): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,DragonLib::Timer>>>>,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::emplace<std::string&>(std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Kty=std::string,
+              _Ty=DragonLib::Timer,
+              _Pr=std::less<std::string>,
+              _Alloc=std::allocator<std::pair<const std::string,DragonLib::Timer>>
+          ]
+C:\Users\rrisland\Documents\GitHub\Internship\utility\multi_timer.cpp(11): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,DragonLib::Timer>>>>,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::emplace<std::string&>(std::string &)' のリファレンスを確認してください
+          with
+          [
+              _Kty=std::string,
+              _Ty=DragonLib::Timer,
+              _Pr=std::less<std::string>,
+              _Alloc=std::allocator<std::pair<const std::string,DragonLib::Timer>>
+          ]
+  opengl.cpp
+  window.cpp
   コードを生成中...
-  Internship.vcxproj -> C:\Users\rrisland\Documents\GitHub\Internship\Debug\Internship.exe
