@@ -11,7 +11,7 @@
 
 namespace DragonLib
 {
-    class DirectX11
+    class DirectX11 : public RenderBase
     {
     public:
         void Initialize();
@@ -20,3 +20,4 @@ namespace DragonLib
         void ClearScreen(uint32_t r, uint32_t g, uint32_t b);
     };
 }
+

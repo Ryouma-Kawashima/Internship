@@ -22,6 +22,7 @@
     <ClInclude Include="system\config.h" />
     <ClInclude Include="render\directx11.h" />
     <ClInclude Include="system\main.h" />
+    <ClInclude Include="utility\debug_printf.h" />
     <ClInclude Include="utility\multi_timer.h" />
     <ClInclude Include="render\opengl.h" />
     <ClInclude Include="utility\parallel_timer.h" />
@@ -34,6 +35,7 @@
   <ItemGroup>
     <ClCompile Include="render\directx11.cpp" />
     <ClCompile Include="system\main.cpp" />
+    <ClCompile Include="utility\debug_printf.cpp" />
     <ClCompile Include="utility\multi_timer.cpp" />
     <ClCompile Include="render\opengl.cpp" />
     <ClCompile Include="utility\parallel_timer.cpp" />

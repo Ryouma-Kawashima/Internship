@@ -1,4 +1,3 @@
-#include <string>
 #include <map>
 #include "param.h"
 
@@ -10,7 +9,7 @@ void ParallelTimer::Start()
 {
     m_StartTime = std::chrono::high_resolution_clock::now();
 }
-void ParallelTimer::Stop(std::string id)
+void ParallelTimer::Stop(const TCHAR* id)
 {
     m_EndTimes[id] = std::chrono::high_resolution_clock::now();
 }
@@ -24,7 +23,7 @@ void ParallelTimer::AllStop()
     }
 }
 template <class T>
-uint64_t ParallelTimer::GetElapsedTime(std::string id)
+uint64_t ParallelTimer::GetElapsedTime(const TCHAR* id)
 {
     return m_EndTimes[id] - m_StartTime;
 }

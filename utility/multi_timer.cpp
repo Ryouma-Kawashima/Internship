@@ -1,4 +1,3 @@
-#include <string>
 #include <map>
 #include "param.h"
 
@@ -6,11 +5,13 @@
 
 using namespace DragonLib;
 
-void MultiTimer::AddTimer(std::string id)
+/*
+
+void MultiTimer::AddTimer(const TCHAR* id)
 {
     m_Timers.emplace(id);
 }
-void MultiTimer::Start(std::string id)
+void MultiTimer::Start(const TCHAR* id)
 {
     m_Timers[id].Start();
 }
@@ -21,7 +22,7 @@ void MultiTimer::StartAll()
         timer.second.Start();
     }
 }
-void MultiTimer::Stop(std::string id)
+void MultiTimer::Stop(const TCHAR* id)
 {
     m_Timers[id].Stop();
 }
@@ -33,7 +34,7 @@ void MultiTimer::StopAll()
     }
 }
 template <class T>
-uint64_t MultiTimer::GetElapsedTime(std::string id)
+uint64_t MultiTimer::GetElapsedTime(const TCHAR* id)
 {
     return m_Timers[id].GetElapsedTime<T>();
 }
@@ -51,3 +52,4 @@ uint64_t MultiTimer::GetElapsedTimeAverage()
 
     return sum / cnt;
 }
+*/

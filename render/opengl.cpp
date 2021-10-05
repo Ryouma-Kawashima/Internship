@@ -1,3 +1,6 @@
+#include "../utility/param.h"
+#include "../system/window.h"
+
 #include "opengl.h"
 
 using namespace DragonLib;

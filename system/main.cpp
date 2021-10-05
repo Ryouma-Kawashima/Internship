@@ -1,7 +1,5 @@
 
 #include <map>
-#include <string>
-
 #include "config.h"
 #include "window.h"
 #include "../utility/parallel_timer.h"
@@ -10,7 +8,7 @@ using namespace DragonLib;
 
 #if defined(OS_WINDOWS)
 
-int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCmdLine, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hInstance);
 	UNREFERENCED_PARAMETER(hPrevInstance);
@@ -19,10 +17,23 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 	Window window( WINDOW_WIDTH, WINDOW_HEIGHT );
 	window.SetWindowShow(nCmdShow);
 
+
+
+
 	timeBeginPeriod(1);
 
 	ParallelTimer timer;
+
+	timer.AddId(_T("Exec"));
+	timer.AddId(_T("Debug"));
+
 	timer.Start();
+
+
+
+
+
+
 
 	MSG msg;
 	while (1)
@@ -41,10 +52,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 		}
 		else
 		{
-			timer.Stop(std::string("ExecutionTimer"));
+			timer.Stop(_T("Exec"));
 
-			/*
-			if ((dwCurrentTime - dwExecLastTime) >= (TIMER_FREQUENCY / FPS))
+			if (timer.GetElapsedTime<Timer::NanoSeconds>(_T("Exec")) >= EXEC_WAIT_TIME)
 			{
 				dwExecLastTime = dwCurrentTime;
 				dwTickPerSec++;
@@ -74,7 +84,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 				Sleep(0);
 			#endif
 			}
-			*/
 		}
 	}
 

@@ -2,20 +2,23 @@
 
 #include "timer.h"
 
+/*
 namespace DragonLib
 {
     class MultiTimer
     {
     public:
-        void AddTimer(std::string id);
-        void Start(std::string id);
+        void AddTimer(const TCHAR* id);
+        void Start(const TCHAR* id);
         void StartAll();
-        void Stop(std::string id);
+        void Stop(const TCHAR* id);
         void StopAll();
-        template <class T> uint64_t GetElapsedTime(std::string id);
+        template <class T> uint64_t GetElapsedTime(const TCHAR* id);
         template <class T> uint64_t GetElapsedTimeAverage();
 
     private:
-        std::map<std::string, Timer> m_Timers;
+        std::map<const TCHAR*, Timer> m_Timers;
     };
 }
+*/
+

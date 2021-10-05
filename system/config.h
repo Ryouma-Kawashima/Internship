@@ -23,6 +23,7 @@ namespace DragonLib
     constexpr uint64_t TIMER_FREQUENCY = 1000;
     constexpr uint64_t DEBUG_FREQUENCY = 1000;
     constexpr uint64_t FPS = 60;
+    constexpr uint64_t EXEC_WAIT_TIME = TIMER_FREQUENCY / FPS;
 
     constexpr uint32_t PAUSE_NUM = 5;
 

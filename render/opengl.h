@@ -2,8 +2,6 @@
 
 #include "render.h"
 
-#include "../system/window.h"
-
 #include <gl/GL.h>
 #include <gl/GLU.h>
 

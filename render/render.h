@@ -25,7 +25,6 @@ namespace DragonLib
             SP_CAST(T)->Finalize();
         }
 
-        // r,g,b: 0 ~ 255
         void inline ClearScreen(uint32_t r, uint32_t g, uint32_t b)
         {
             SP_CAST(T)->ClearScreen(r, g, b);
