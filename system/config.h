@@ -29,6 +29,10 @@ namespace DragonLib
 
     constexpr uint32_t COORD_SYSTEM = CoordSystem_Left;
 
+    constexpr float BG_COLOR_R = 0.0f; // BackGround Color R
+    constexpr float BG_COLOR_G = 0.5f; // BackGround Color G
+    constexpr float BG_COLOR_B = 0.5f; // BackGround Color B
+
 
     // System Timer
     constexpr uint64_t TIMER_FREQUENCY  = 1000000000; // nanoseconds ( 10 ^ -9 )

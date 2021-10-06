@@ -8,7 +8,7 @@ namespace DragonLib
     class Renderer
     {
     public:
-        void Initialize(Window& window)
+        void Initialize(Window* window)
         {
             m_Renderer.Initialize(window);
         }
@@ -17,19 +17,14 @@ namespace DragonLib
             m_Renderer.Finalize();
         }
 
-        void Begin()
+        void Begin(float r = BG_COLOR_R, float g = BG_COLOR_G, float b = BG_COLOR_B)
         {
-            m_Renderer.Begin();
+            m_Renderer.Begin(r, g, b);
         }
         void End()
         {
             m_Renderer.End();
         }
-
-        void ClearScreen(uint32_t r, uint32_t g, uint32_t b)
-        {
-            m_Renderer.ClearScreen(r, g, b);
-        } 
 
         void SetCoordSystem(uint32_t cmd)
         {

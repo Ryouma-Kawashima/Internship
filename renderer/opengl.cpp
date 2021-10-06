@@ -17,19 +17,22 @@ void OpenGL::Finalize()
 
 }
 
-void OpenGL::Begin()
+void OpenGL::Begin(float r, float g, float b)
 {
-
+    UNREFERENCED_PARAMETER(r);
+    UNREFERENCED_PARAMETER(g);
+    UNREFERENCED_PARAMETER(b);
 }
 void OpenGL::End()
 {
 
 }
 
-void OpenGL::ClearScreen(uint32_t r, uint32_t g, uint32_t b)
+void OpenGL::SetCoordSystem(uint32_t cmd)
 {
-    UNREFERENCED_PARAMETER(r);
-    UNREFERENCED_PARAMETER(g);
-    UNREFERENCED_PARAMETER(b);
+    if (cmd == CoordSystem_Left || cmd == CoordSystem_Right)
+    {
+        m_CoordSystem = cmd;
+    }
 }
 

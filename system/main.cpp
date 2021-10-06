@@ -18,7 +18,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 	window.SetWindowShow( nCmdShow );
 
 	RenderAPI renderer;
-	renderer.Initialize(window);
+	renderer.Initialize(&window);
 
 	timeBeginPeriod(1);
 	
@@ -77,7 +77,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 				#endif
 
 
-
+				renderer.Begin();
+				renderer.End();
 
 			}
 			else
