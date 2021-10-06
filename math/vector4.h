@@ -14,7 +14,7 @@ namespace DragonLib
     >
     struct Vector4
     {
-        static_assert(IsSupported, "Tにサポートされていない型が入りました。");
+        static_assert(IsSupported, "Vector4<T>にサポートされていない型が入りました。");
     };
 
     template <class T>
@@ -23,27 +23,25 @@ namespace DragonLib
         Vector4(const T* a);
         Vector4(T x, T y, T z, T w);
 
-        // Calc
-        static void Dot(Vector4<T>*out, Vector4<T>*v1, Vector4<T>*v2);
-        static void Cross(Vector4<T>*out, Vector4<T>*v1, Vector4<T>*v2);
-        static void Length(T * out, Vector4<T>*v);
-        static void Normalize(T * out, Vector4<T>*v);
-
         // Casting
         operator T* ();
         operator const T* () const;
 
+        #if !CAN_BE_USED_SIMD
+
         // Assignment
-        Vector4<T>& operator += (const Vector4<T>&v);
-        Vector4<T>& operator -= (const Vector4<T>&v);
-        Vector4<T>& operator *= (const Vector4<T>&v);
-        Vector4<T>& operator /= (const Vector4<T>&v);
+        Vector4<T>& operator += (const Vector4<T>& v);
+        Vector4<T>& operator -= (const Vector4<T>& v);
+        Vector4<T>& operator *= (const Vector4<T>& v);
+        Vector4<T>& operator /= (const Vector4<T>& v);
 
         // Binary
-        Vector4<T> operator + (const Vector4<T>&v) const;
-        Vector4<T> operator - (const Vector4<T>&v) const;
-        Vector4<T> operator * (const Vector4<T>&v) const;
-        Vector4<T> operator / (const Vector4<T>&v) const;
+        Vector4<T> operator + (const Vector4<T>& v) const;
+        Vector4<T> operator - (const Vector4<T>& v) const;
+        Vector4<T> operator * (const Vector4<T>& v) const;
+        Vector4<T> operator / (const Vector4<T>& v) const;
+
+        #endif
     };
 
     template <>
@@ -59,8 +57,27 @@ namespace DragonLib
             #endif
         };
 
+        // Calc
+        static void Dot(float* out, Vector4<float>* v1, Vector4<float>* v2);
+        static void Cross(Vector4<float>* out, Vector4<float>* v1, Vector4<float>* v2);
+        static void Length(float* out, Vector4<float>* v);
+        static void Normalize(Vector4<float>* out, Vector4<float>* v);
+
         #if CAN_BE_USED_SIMD
-        operator __m128* () { return m; };
+        Vector4(__m128 m) { this->m = m; }
+        operator __m128* () { return &m; }
+
+        // Assignment
+        Vector4<float>& operator += (const Vector4<float>& v);
+        Vector4<float>& operator -= (const Vector4<float>& v);
+        Vector4<float>& operator *= (const Vector4<float>& v);
+        Vector4<float>& operator /= (const Vector4<float>& v);
+
+        // Binary
+        Vector4<float> operator + (const Vector4<float>& v) const;
+        Vector4<float> operator - (const Vector4<float>& v) const;
+        Vector4<float> operator * (const Vector4<float>& v) const;
+        Vector4<float> operator / (const Vector4<float>& v) const;
         #endif
     };
 
@@ -78,7 +95,20 @@ namespace DragonLib
         };
 
         #if CAN_BE_USED_SIMD
-        operator __m256d* () { return m; };
+        Vector4(__m256d m) { this->m = m; }
+        operator __m256d* () { return &m; }
+
+        // Assignment
+        Vector4<double>& operator += (const Vector4<double>& v);
+        Vector4<double>& operator -= (const Vector4<double>& v);
+        Vector4<double>& operator *= (const Vector4<double>& v);
+        Vector4<double>& operator /= (const Vector4<double>& v);
+
+        // Binary
+        Vector4<double> operator + (const Vector4<double>& v) const;
+        Vector4<double> operator - (const Vector4<double>& v) const;
+        Vector4<double> operator * (const Vector4<double>& v) const;
+        Vector4<double> operator / (const Vector4<double>& v) const;
         #endif
     };
 
@@ -96,7 +126,20 @@ namespace DragonLib
         };
 
         #if CAN_BE_USED_SIMD
-        operator __m128i* () { return m; };
+        Vector4(__m128i m) { this->m = m; }
+        operator __m128i* () { return &m; }
+
+        // Assignment
+        Vector4<uint32_t>& operator += (const Vector4<uint32_t>& v);
+        Vector4<uint32_t>& operator -= (const Vector4<uint32_t>& v);
+        Vector4<uint32_t>& operator *= (const Vector4<uint32_t>& v);
+        Vector4<uint32_t>& operator /= (const Vector4<uint32_t>& v);
+
+        // Binary
+        Vector4<uint32_t> operator + (const Vector4<uint32_t>& v) const;
+        Vector4<uint32_t> operator - (const Vector4<uint32_t>& v) const;
+        Vector4<uint32_t> operator * (const Vector4<uint32_t>& v) const;
+        Vector4<uint32_t> operator / (const Vector4<uint32_t>& v) const;
         #endif
     };
 
@@ -114,7 +157,20 @@ namespace DragonLib
         };
 
         #if CAN_BE_USED_SIMD
-        operator __m256i* () { return m; };
+        Vector4(__m256i m) { this->m = m; }
+        operator __m256i* () { return &m; }
+
+        // Assignment
+        Vector4<uint64_t>& operator += (const Vector4<uint64_t>& v);
+        Vector4<uint64_t>& operator -= (const Vector4<uint64_t>& v);
+        Vector4<uint64_t>& operator *= (const Vector4<uint64_t>& v);
+        Vector4<uint64_t>& operator /= (const Vector4<uint64_t>& v);
+
+        // Binary
+        Vector4<uint64_t> operator + (const Vector4<uint64_t>& v) const;
+        Vector4<uint64_t> operator - (const Vector4<uint64_t>& v) const;
+        Vector4<uint64_t> operator * (const Vector4<uint64_t>& v) const;
+        Vector4<uint64_t> operator / (const Vector4<uint64_t>& v) const;
         #endif
     };
 }

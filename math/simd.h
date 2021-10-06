@@ -10,5 +10,5 @@
 
 #endif
 
-#define CAN_BE_USED_SIMD USE_SIMD && defined(__IMM_INCLUDE)
+#define CAN_BE_USED_SIMD USE_SIMD
 
