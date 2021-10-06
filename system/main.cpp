@@ -1,8 +1,4 @@
-
-#include <map>
-#include "config.h"
-#include "window.h"
-#include "../utility/parallel_timer.h"
+#include "main.h"
 
 using namespace DragonLib;
 
@@ -14,25 +10,18 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+
 	Window window( WINDOW_WIDTH, WINDOW_HEIGHT );
 	window.SetWindowShow(nCmdShow);
 
-
-
+	RenderAPI renderer;
 
 	timeBeginPeriod(1);
-
-	ParallelTimer timer;
-
-	timer.AddId(_T("Exec"));
-	timer.AddId(_T("Debug"));
-
-	timer.Start();
-
-
-
-
-
+	
+	uint32_t tickCount = 0;
+	Timer execTimer, debugTimer;
+	execTimer.Start();
+	debugTimer.Start();
 
 
 	MSG msg;
@@ -52,37 +41,39 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 		}
 		else
 		{
-			timer.Stop(_T("Exec"));
+			execTimer.Stop();
 
-			if (timer.GetElapsedTime<Timer::NanoSeconds>(_T("Exec")) >= EXEC_WAIT_TIME)
+			if (execTimer.GetElapsedTime<Timer::NanoSeconds>() > EXEC_WAIT_TIME)
 			{
-				dwExecLastTime = dwCurrentTime;
-				dwTickPerSec++;
+				execTimer.Start();
+				tickCount++;
 
 				// FPS‚ÌŒv‘ª
-				#if defined(__DEBUG) || defined(_DEBUG)
+				#if defined( __DEBUG ) || defined( _DEBUG )
 
-				if (dwExecLastTime > dwLastElapsedTime + DEBUG_FREQUENCY)
+				if (execTimer.GetStartTime<Timer::NanoSeconds>() > 
+					debugTimer.GetStartTime<Timer::NanoSeconds>() + DEBUG_WAIT_TIME)
 				{
-					//DebugPrintf("FPS: %ld\n", dwTickPerSec * TIMER_FREQUENCY / DEBUG_FREQUENCY);
+					DebugPrintf("FPS: %ld\n", tickCount * DEBUG_PER_SECOND);
 
-					dwLastElapsedTime = dwExecLastTime;
-					dwTickPerSec = 0;
+					debugTimer = execTimer;
+					tickCount = 0;
 				}
 
 				#endif
 			}
 			else
 			{
-			#ifdef USE_PAUSE
-				for (uint32_t i = 0; i < PAUSE_NUM; i++)
+				#ifdef USE_PAUSE
+				for (uint32_t i = 0; i < PAUSE_LOOP_NUM; i++)
 				{
 					_mm_pause();
 				}
-			#endif
-			#ifdef USE_SLEEP
+				#endif
+
+				#ifdef USE_SLEEP
 				Sleep(0);
-			#endif
+				#endif
 			}
 		}
 	}

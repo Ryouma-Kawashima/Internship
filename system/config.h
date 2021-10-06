@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../utility/param.h"
-
 namespace DragonLib
 {
     // Main
@@ -12,6 +10,7 @@ namespace DragonLib
     #define USE_PAUSE
     #define USE_SLEEP
 
+
     // Render
     #define ENGINE_DIRECTX11
 
@@ -19,13 +18,27 @@ namespace DragonLib
     //#define ENGINE_OPENGL
     //#define ENGINE_VULKAN
 
-    // System Timer
-    constexpr uint64_t TIMER_FREQUENCY = 1000;
-    constexpr uint64_t DEBUG_FREQUENCY = 1000;
-    constexpr uint64_t FPS = 60;
-    constexpr uint64_t EXEC_WAIT_TIME = TIMER_FREQUENCY / FPS;
+    enum RenderSetting
+    {
+        // ç¿ïWån
+        CoordSystem_Left,
+        CoordSystem_Right,
+    };
 
-    constexpr uint32_t PAUSE_NUM = 5;
+    constexpr uint32_t COORD_SYSTEM = CoordSystem_Left;
+
+
+    // System Timer
+    constexpr uint64_t TIMER_FREQUENCY  = 1000000000; // nanoseconds ( 10 ^ -9 )
+    constexpr uint64_t DEBUG_FREQUENCY  = 1000000000; // nanoseconds ( 10 ^ -9 )
+    constexpr uint64_t FPS = 60;
+
+    constexpr uint64_t EXEC_WAIT_TIME   = TIMER_FREQUENCY / FPS;
+    constexpr uint64_t DEBUG_WAIT_TIME  = DEBUG_FREQUENCY;
+    constexpr uint64_t DEBUG_PER_SECOND = TIMER_FREQUENCY / DEBUG_FREQUENCY;
+
+    constexpr uint32_t PAUSE_LOOP_NUM = 5;
+
 
     // Window
     constexpr TCHAR CLASS_NAME[]    = _T("App Class");

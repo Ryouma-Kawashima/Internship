@@ -19,26 +19,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="renderer\renderer_base.h" />
     <ClInclude Include="system\config.h" />
-    <ClInclude Include="render\directx11.h" />
+    <ClInclude Include="renderer\directx11.h" />
     <ClInclude Include="system\main.h" />
     <ClInclude Include="utility\debug_printf.h" />
-    <ClInclude Include="utility\multi_timer.h" />
-    <ClInclude Include="render\opengl.h" />
-    <ClInclude Include="utility\parallel_timer.h" />
+    <ClInclude Include="renderer\opengl.h" />
     <ClInclude Include="utility\param.h" />
-    <ClInclude Include="render\render.h" />
+    <ClInclude Include="renderer\renderer.h" />
     <ClInclude Include="utility\static_polymorphism.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="system\window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="render\directx11.cpp" />
+    <ClCompile Include="renderer\directx11.cpp" />
+    <ClCompile Include="renderer\renderer.cpp" />
+    <ClCompile Include="system\config.cpp" />
     <ClCompile Include="system\main.cpp" />
     <ClCompile Include="utility\debug_printf.cpp" />
-    <ClCompile Include="utility\multi_timer.cpp" />
-    <ClCompile Include="render\opengl.cpp" />
-    <ClCompile Include="utility\parallel_timer.cpp" />
+    <ClCompile Include="renderer\opengl.cpp" />
     <ClCompile Include="utility\timer.cpp" />
     <ClCompile Include="system\window.cpp" />
   </ItemGroup>

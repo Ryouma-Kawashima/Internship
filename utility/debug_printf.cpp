@@ -21,6 +21,8 @@ int DragonLib::DebugPrintf(const char* format, ...)
     OutputDebugStringA(buf);
     _freea(buf);
 
+    return static_cast<int>(len);
+
 #else
 
     UNREFEREENCED_PARAMETER(format);

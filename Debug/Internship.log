@@ -1,4 +1,8 @@
-﻿  main.cpp
-  multi_timer.cpp
+﻿  directx11.cpp
+  opengl.cpp
+  renderer.cpp
+  config.cpp
+  main.cpp
+  window.cpp
   コードを生成中...
   Internship.vcxproj -> C:\Users\rrisland\Documents\GitHub\Internship\Debug\Internship.exe
