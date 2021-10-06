@@ -67,19 +67,19 @@ void DirectX11::Initialize(Window& window)
     //    }
     //}
 
-    //hr = D3D11CreateDeviceAndSwapChain(
-    //    nullptr,
-    //    D3D_DRIVER_TYPE_HARDWARE,
-    //    nullptr,
-    //    0,
-    //    featureLevels,
-    //    2,
-    //    D3D11_SDK_VERSION,
-    //    &swapChainDesc,
-    //    &m_SwapChain,
-    //    &m_Device,
-    //    &m_FeatureLevel,
-    //    &m_DeviceContext);
+    hr = D3D11CreateDeviceAndSwapChain(
+        nullptr,
+        D3D_DRIVER_TYPE_HARDWARE,
+        nullptr,
+        0,
+        featureLevels,
+        2,
+        D3D11_SDK_VERSION,
+        &swapChainDesc,
+        &m_SwapChain,
+        &m_Device,
+        &m_FeatureLevel,
+        &m_DeviceContext);
 
     /*
     // レンダーターゲットビューの作成
@@ -245,18 +245,18 @@ void DirectX11::Initialize(Window& window)
 }
 void DirectX11::Finalize()
 {
-    SAFE_RELEASE(m_Device);
-    SAFE_RELEASE(m_DeviceContext);
-    SAFE_RELEASE(m_SwapChain);
-    SAFE_RELEASE(m_RenderTargetView);
-    SAFE_RELEASE(m_DepthStencilView);
-    SAFE_RELEASE(m_WorldBuffer);
-    SAFE_RELEASE(m_ViewBuffer);
-    SAFE_RELEASE(m_ProjectionBuffer);
-    SAFE_RELEASE(m_MaterialBuffer);
-    SAFE_RELEASE(m_LightBuffer);
-    SAFE_RELEASE(m_DepthStateEnable);
-    SAFE_RELEASE(m_DepthStateDisable);
+    //SAFE_RELEASE(m_Device);
+    //SAFE_RELEASE(m_DeviceContext);
+    //SAFE_RELEASE(m_SwapChain);
+    //SAFE_RELEASE(m_RenderTargetView);
+    //SAFE_RELEASE(m_DepthStencilView);
+    //SAFE_RELEASE(m_WorldBuffer);
+    //SAFE_RELEASE(m_ViewBuffer);
+    //SAFE_RELEASE(m_ProjectionBuffer);
+    //SAFE_RELEASE(m_MaterialBuffer);
+    //SAFE_RELEASE(m_LightBuffer);
+    //SAFE_RELEASE(m_DepthStateEnable);
+    //SAFE_RELEASE(m_DepthStateDisable);
 }
 
 void DirectX11::Begin()

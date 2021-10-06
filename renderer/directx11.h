@@ -25,18 +25,18 @@ namespace DragonLib
     private:
         D3D_FEATURE_LEVEL m_FeatureLevel = D3D_FEATURE_LEVEL_11_1;
 
-        ID3D11Device*            m_Device            = nullptr;
-        ID3D11DeviceContext*     m_DeviceContext     = nullptr;
-        IDXGISwapChain*          m_SwapChain         = nullptr;
-        ID3D11RenderTargetView*  m_RenderTargetView  = nullptr;
-        ID3D11DepthStencilView*  m_DepthStencilView  = nullptr;                                     
-        ID3D11Buffer*            m_WorldBuffer       = nullptr;
-        ID3D11Buffer*            m_ViewBuffer        = nullptr;
-        ID3D11Buffer*            m_ProjectionBuffer  = nullptr;
-        ID3D11Buffer*            m_MaterialBuffer    = nullptr;
-        ID3D11Buffer*            m_LightBuffer       = nullptr;                  
-        ID3D11DepthStencilState* m_DepthStateEnable  = nullptr;
-        ID3D11DepthStencilState* m_DepthStateDisable = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Device>            m_Device            = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext>     m_DeviceContext     = nullptr;
+        Microsoft::WRL::ComPtr<IDXGISwapChain>          m_SwapChain         = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_RenderTargetView  = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_DepthStencilView  = nullptr;                                     
+        Microsoft::WRL::ComPtr<ID3D11Buffer>            m_WorldBuffer       = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Buffer>            m_ViewBuffer        = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Buffer>            m_ProjectionBuffer  = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Buffer>            m_MaterialBuffer    = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Buffer>            m_LightBuffer       = nullptr;                  
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_DepthStateEnable  = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_DepthStateDisable = nullptr;
     };
 }
 
