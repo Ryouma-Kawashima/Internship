@@ -19,23 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="renderer\renderer_base.h" />
+    <ClInclude Include="math\simd.h" />
+    <ClInclude Include="math\vector2.h" />
+    <ClInclude Include="math\vector4.h" />
+    <ClInclude Include="renderer\renderer.h" />
     <ClInclude Include="system\config.h" />
     <ClInclude Include="renderer\directx11.h" />
     <ClInclude Include="system\main.h" />
+    <ClInclude Include="system\manager.h" />
     <ClInclude Include="utility\debug_printf.h" />
     <ClInclude Include="renderer\opengl.h" />
     <ClInclude Include="utility\param.h" />
-    <ClInclude Include="renderer\renderer.h" />
+    <ClInclude Include="renderer\render_api.h" />
+    <ClInclude Include="utility\singleton.h" />
     <ClInclude Include="utility\static_polymorphism.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="system\window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="math\simd.cpp" />
+    <ClCompile Include="math\vector2.cpp" />
+    <ClCompile Include="math\vector4.cpp" />
     <ClCompile Include="renderer\directx11.cpp" />
     <ClCompile Include="renderer\renderer.cpp" />
+    <ClCompile Include="renderer\render_api.cpp" />
     <ClCompile Include="system\config.cpp" />
     <ClCompile Include="system\main.cpp" />
+    <ClCompile Include="system\manager.cpp" />
     <ClCompile Include="utility\debug_printf.cpp" />
     <ClCompile Include="renderer\opengl.cpp" />
     <ClCompile Include="utility\timer.cpp" />

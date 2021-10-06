@@ -2,21 +2,23 @@
 
 namespace DragonLib
 {
-    // Main
-    #define OS_WINDOWS
-    //#define OS_LINUX
-    //#define OS_MAC
+    // Common
+    #define SAFE_RELEASE(p) {if(p != nullptr) (p)->Release(); p = nullptr;}
 
-    #define USE_PAUSE
-    #define USE_SLEEP
+    // Main
+    #define OS_WINDOWS  true
+    #define OS_LINUX    false
+    #define OS_MAC      false
+
+    #define USE_PAUSE   true
+    #define USE_SLEEP   true
 
 
     // Render
-    #define ENGINE_DIRECTX11
-
-    //#define ENGINE_DIRECTX12
-    //#define ENGINE_OPENGL
-    //#define ENGINE_VULKAN
+    #define GRAPHIC_DIRECTX11   true
+    #define GRAPHIC_DIRECTX12   false
+    #define GRAPHIC_OPENGL      false
+    #define GRAPHIC_VULKAN      false
 
     enum RenderSetting
     {
@@ -47,5 +49,7 @@ namespace DragonLib
     constexpr uint32_t WINDOW_WIDTH     = 1280;
     constexpr uint32_t WINDOW_HEIGHT    = 720;
 
-    
+
+    // Math
+    #define USE_SIMD true
 }

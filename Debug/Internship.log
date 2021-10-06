@@ -1,8 +1,16 @@
-﻿  directx11.cpp
-  opengl.cpp
+﻿  simd.cpp
+  vector2.cpp
+  vector4.cpp
+  directx11.cpp
+C:\Users\rrisland\Documents\GitHub\Internship\renderer\directx11.cpp(16,13): warning C4189: 'hr': ローカル変数が初期化されましたが、参照されていません
   renderer.cpp
+  render_api.cpp
   config.cpp
   main.cpp
+  manager.cpp
+  debug_printf.cpp
+  opengl.cpp
+  timer.cpp
   window.cpp
   コードを生成中...
   Internship.vcxproj -> C:\Users\rrisland\Documents\GitHub\Internship\Debug\Internship.exe

@@ -7,12 +7,17 @@
 
 namespace DragonLib
 {
-    class OpenGL : public RendererBase
+    class OpenGL : public RenderBase
     {
     public:
-        void Initialize();
+        void Initialize(Window& window);
         void Finalize();
 
+        void Begin();
+        void End();
+
         void ClearScreen(uint32_t r, uint32_t g, uint32_t b);
+
+        
     };
 }

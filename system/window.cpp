@@ -5,10 +5,10 @@
 
 using namespace DragonLib;
 
-Window::Window(uint32_t width, uint32_t height, TCHAR* windowName)
+void Window::Initialize(uint32_t width, uint32_t height, TCHAR* windowName)
 {
-	m_hInstance = GetModuleHandle(NULL);
-	assert(m_hInstance);
+	//m_hInstance = GetModuleHandle(NULL);
+	//assert(m_hInstance);
 
 	if (windowName == nullptr)
 	{
@@ -39,15 +39,19 @@ Window::Window(uint32_t width, uint32_t height, TCHAR* windowName)
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		(width  + GetSystemMetrics(SM_CXDLGFRAME) * 2),
+		(width + GetSystemMetrics(SM_CXDLGFRAME) * 2),
 		(height + GetSystemMetrics(SM_CXDLGFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION)),
 		NULL,
 		NULL,
 		m_hInstance,
 		NULL);
+	assert(m_hWnd);
+
+	m_Width		= width;
+	m_Height	= height;
 }
 
-Window::~Window()
+void Window::Finalize()
 {
 	UnregisterClass(CLASS_NAME, m_WindowClass.hInstance);
 }
@@ -68,6 +72,19 @@ void Window::SetWindowShow(int32_t cmdShow)
 {
 	ShowWindow(m_hWnd, cmdShow);
 	UpdateWindow(m_hWnd);
+}
+
+HWND Window::GetHandle()
+{
+	return m_hWnd;
+}
+uint32_t Window::GetWidth()
+{
+	return m_Width;
+}
+uint32_t Window::GetHeight()
+{
+	return m_Height;
 }
 
 HRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

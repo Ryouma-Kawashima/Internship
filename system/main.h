@@ -3,6 +3,7 @@
 // 依存なし 既存ヘッダー
 #include <map>
 #include <cassert>
+#include <intrin.h>
 
 // 依存なし 独自ヘッダー
 #include "../utility/debug_printf.h"
@@ -17,8 +18,8 @@
 
 // 優先度 通常
 #include "../system/window.h"
-#include "../renderer/renderer_base.h"
 #include "../renderer/renderer.h"
+#include "../renderer/render_api.h"
 
 // 優先度 低い
 

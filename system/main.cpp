@@ -6,15 +6,17 @@ using namespace DragonLib;
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCmdLine, int nCmdShow)
 {
-	UNREFERENCED_PARAMETER(hInstance);
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER( hInstance );
+	UNREFERENCED_PARAMETER( hPrevInstance );
+	UNREFERENCED_PARAMETER( lpCmdLine );
 
 
-	Window window( WINDOW_WIDTH, WINDOW_HEIGHT );
-	window.SetWindowShow(nCmdShow);
+	Window window;
+	window.Initialize( WINDOW_WIDTH, WINDOW_HEIGHT );
+	window.SetWindowShow( nCmdShow );
 
 	RenderAPI renderer;
+	renderer.Initialize(window);
 
 	timeBeginPeriod(1);
 	
@@ -64,14 +66,14 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 			}
 			else
 			{
-				#ifdef USE_PAUSE
+				#if USE_PAUSE
 				for (uint32_t i = 0; i < PAUSE_LOOP_NUM; i++)
 				{
 					_mm_pause();
 				}
 				#endif
 
-				#ifdef USE_SLEEP
+				#if USE_SLEEP
 				Sleep(0);
 				#endif
 			}
@@ -79,8 +81,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 	}
 
 	timeEndPeriod(1);
+	renderer.Finalize();
+	window.Finalize();
 
-	return (int)msg.wParam;
+	return static_cast<int>(msg.wParam);
 }
 
 #elif defined(OS_LINUX)
