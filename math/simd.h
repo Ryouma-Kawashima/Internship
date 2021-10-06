@@ -4,7 +4,7 @@
 
 #include <intrin.h>
 
-#elif OS_LINUX
+#else
 
 #include <x86intrin.h>
 

@@ -69,6 +69,9 @@
     <ClInclude Include="math\simd.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="math\matrix4x4.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="renderer\directx11.cpp">
@@ -108,6 +111,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="renderer\renderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="math\matrix4x4.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

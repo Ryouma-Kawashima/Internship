@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="math\matrix4x4.h" />
     <ClInclude Include="math\simd.h" />
     <ClInclude Include="math\vector2.h" />
     <ClInclude Include="math\vector4.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="system\window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="math\matrix4x4.cpp" />
     <ClCompile Include="math\simd.cpp" />
     <ClCompile Include="math\vector2.cpp" />
     <ClCompile Include="math\vector4.cpp" />

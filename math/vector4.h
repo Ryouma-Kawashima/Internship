@@ -2,11 +2,14 @@
 
 namespace DragonLib
 {
-    __declspec(align(16)) struct Vector4
+    // SIMDへ変換して使う場合はアライメントを16にしとく必要がある
+    #if CAN_BE_USED_SIMD
+    __declspec(align(16))
+    #endif
+    struct Vector4
     {
         union
         {
-            float f[4];
             float x, y, z, w;
             float r, g, b, a;
 
@@ -19,12 +22,13 @@ namespace DragonLib
         Vector4(float xyzw);
         Vector4(float x, float y, float z, float w);
         #if CAN_BE_USED_SIMD
-        Vector4(__m128 m);
+        Vector4(const __m128 m);
+        Vector4(const __m128* m);
         #endif
 
         // Math
-        static void Dot(float& out, Vector4& v1, Vector4& v2);
-        static void Cross(Vector4& out, Vector4& v1, Vector4& v2);
+        static void Dot(float& out, Vector4& v0, Vector4& v1);
+        static void Cross(Vector4& out, Vector4& v0, Vector4& v1);
         static void Length(float& out, Vector4& v);
         static void Normalize(Vector4& out, Vector4& v);
 

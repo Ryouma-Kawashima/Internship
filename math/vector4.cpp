@@ -7,7 +7,7 @@
 
 #include "vector4.h"
 
-#include <tgmath.h>
+#include <ctgmath>
 
 using namespace DragonLib;
 
@@ -26,9 +26,13 @@ Vector4::Vector4(float x, float y, float z, float w)
 {
     m = _mm_set_ps(w, z, y, x);
 }
-Vector4::Vector4(__m128 m)
+Vector4::Vector4(const __m128 m)
 {
     this->m = m;
+}
+Vector4::Vector4(const __m128* m)
+{
+    this->m = *m;
 }
 
 #else
@@ -60,24 +64,24 @@ Vector4::Vector4(float x, float y, float z, float w)
 // Calc
 #if CAN_BE_USED_SIMD
 
-void Vector4::Dot(float& out, Vector4& v1, Vector4& v2)
+void Vector4::Dot(float& out, Vector4& v0, Vector4& v1)
 {
     #ifdef _INCLUDED_SMM // SSE3
-    out = _mm_dp_ps(v1.m, v2.m, 0xFF).m128_i32[0];
+    out = _mm_dp_ps(v0.m, v1.m, 0xFF).m128_f32[0];
     #else
-    __m128 m = _mm_mul_ps(v1.m, v2.m);
+    __m128 m = _mm_mul_ps(v0.m, v1.m);
     out = m.m128_f32[0] + m.m128_f32[1] + m.m128_f32[2] + m.m128_f32[3];
     #endif
 }
-void Vector4::Cross(Vector4& out, Vector4& v1, Vector4& v2)
+void Vector4::Cross(Vector4& out, Vector4& v0, Vector4& v1)
 {
     out.m = _mm_sub_ps(
-        _mm_mul_ps(_mm_shuffle_ps(v1.m, v1.m, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(v2.m, v2.m, _MM_SHUFFLE(3, 1, 0, 2))),
-        _mm_mul_ps(_mm_shuffle_ps(v1.m, v1.m, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(v2.m, v2.m, _MM_SHUFFLE(3, 0, 2, 1))));
+        _mm_mul_ps(_mm_shuffle_ps(v0.m, v0.m, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(v1.m, v1.m, _MM_SHUFFLE(3, 1, 0, 2))),
+        _mm_mul_ps(_mm_shuffle_ps(v0.m, v0.m, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(v1.m, v1.m, _MM_SHUFFLE(3, 0, 2, 1))));
 }
 void Vector4::Length(float& out, Vector4& v)
 {
-    __m128 m = _mm_sqrt_ps(_mm_div_ps(v.m, v.m));
+    __m128 m = _mm_sqrt_ps(_mm_mul_ps(v.m, v.m));
     out = m.m128_f32[0] + m.m128_f32[1] + m.m128_f32[2] + m.m128_f32[3];
 }
 void Vector4::Normalize(Vector4& out, Vector4& v)
@@ -89,16 +93,16 @@ void Vector4::Normalize(Vector4& out, Vector4& v)
 
 #else
 
-void Vector4::Dot(float& out, Vector4& v1, Vector4& v2)
+void Vector4::Dot(float& out, Vector4& v0, Vector4& v1)
 {
-    out = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+    out = v0.x * v1.x + v0.y * v1.y + v0.z * v1.z + v0.w * v1.w;
 }
-void Vector4::Cross(Vector4& out, Vector4& v1, Vector4& v2)
+void Vector4::Cross(Vector4& out, Vector4& v0, Vector4& v1)
 {
     out = Vector4(
-        v1.y * v2.z - v1.z * v2.y,
-        v1.z * v2.x - v1.x * v2.z,
-        v1.x * v2.y - v1.y * v2.x,
+        v0.y * v1.z - v0.z * v1.y,
+        v0.z * v1.x - v0.x * v1.z,
+        v0.x * v1.y - v0.y * v1.x,
         0.0f);
 }
 void Vector4::Length(float& out, Vector4& v)

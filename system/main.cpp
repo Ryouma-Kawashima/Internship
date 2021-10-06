@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include "../math/vector4.h"
+
 using namespace DragonLib;
 
 #if defined(OS_WINDOWS)
@@ -24,6 +26,16 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 	Timer execTimer, debugTimer;
 	execTimer.Start();
 	debugTimer.Start();
+
+	float len = 0;
+	Vector4 vec1(1, 0, 0, 0);
+	Vector4 vec2(0, 1, 0, 0);
+	Vector4 vec3(0.0f);
+	Vector4::Length(len, vec1);
+	Vector4::Cross(vec3, vec2, vec1);
+
+	DebugPrintf("Vector4_Length: %f\n", len);
+	DebugPrintf("Vector4_Cross: %.1f, %.1f, %.1f, %.1f\n", vec3.x, vec3.y, vec3.z, vec3.w);
 
 
 	MSG msg;
@@ -63,6 +75,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 				}
 
 				#endif
+
+
+
+
 			}
 			else
 			{
