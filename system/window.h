@@ -17,7 +17,12 @@ namespace DragonLib
         HWND GetHandle();
         uint32_t GetWidth();
         uint32_t GetHeight();
+
+        #if defined(_WIN64)
+        static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+        #else
         static HRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+        #endif
 
     private:
         HWND        m_hWnd          = nullptr;

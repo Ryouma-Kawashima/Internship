@@ -7,8 +7,8 @@ using namespace DragonLib;
 
 void Window::Initialize(uint32_t width, uint32_t height, TCHAR* windowName)
 {
-	//m_hInstance = GetModuleHandle(NULL);
-	//assert(m_hInstance);
+	m_hInstance = GetModuleHandle(NULL);
+	assert(m_hInstance);
 
 	if (windowName == nullptr)
 	{
@@ -87,7 +87,11 @@ uint32_t Window::GetHeight()
 	return m_Height;
 }
 
+#if defined(_WIN64)
+LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+#else
 HRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+#endif
 {
     switch (uMsg)
     {
