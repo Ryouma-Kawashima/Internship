@@ -11,16 +11,43 @@
 
 using namespace DragonLib;
 
-template <class T>
-Vector4<T, true>::Vector4<T, true>(const T* a)
+
+#if CAN_BE_USED_SIMD
+
+Vector4::Vector4(const float* a)
+{
+    m = _mm_loadr_ps(a);
+}
+Vector4::Vector4(float xyzw)
+{
+    m = _mm_set_ps1(xyzw);
+}
+Vector4::Vector4(float x, float y, float z, float w)
+{
+    m = _mm_set_ps(w, z, y, x);
+}
+Vector4::Vector4(__m128 m)
+{
+    this->m = m;
+}
+
+#else
+
+Vector4::Vector4(const float* a)
 {
     x = a[0];
     y = a[1];
     z = a[2];
     w = a[3];
 }
-template <class T>
-Vector4<T, true>::Vector4<T, true>(T x, T y, T z, T w)
+Vector4::Vector4(float xyzw)
+{
+    x = xyzw;
+    y = xyzw;
+    z = xyzw;
+    w = xyzw;
+}
+Vector4::Vector4(float x, float y, float z, float w)
 {
     this->x = x;
     this->y = y;
@@ -28,240 +55,193 @@ Vector4<T, true>::Vector4<T, true>(T x, T y, T z, T w)
     this->w = w;
 }
 
+#endif
+
 // Calc
-template <class T>
-void Vector4<T, true>::Dot(Vector4<T>* out, Vector4<T>* v1, Vector4<T>* v2)
+#if CAN_BE_USED_SIMD
+
+void Vector4::Dot(float& out, Vector4& v1, Vector4& v2)
 {
-    *out = v1->x * v2->x + v1->y * v2->y + v1->z * v2->z + v1->w * v2->w;
+    #ifdef _INCLUDED_SMM // SSE3
+    out = _mm_dp_ps(v1.m, v2.m, 0xFF).m128_i32[0];
+    #else
+    __m128 m = _mm_mul_ps(v1.m, v2.m);
+    out = m.m128_f32[0] + m.m128_f32[1] + m.m128_f32[2] + m.m128_f32[3];
+    #endif
 }
-template <class T>
-void Vector4<T, true>::Cross(T* out, Vector4<T>* v1, Vector4<T>* v2)
+void Vector4::Cross(Vector4& out, Vector4& v1, Vector4& v2)
 {
-    *out = v1->y * v2->z 
+    out.m = _mm_sub_ps(
+        _mm_mul_ps(_mm_shuffle_ps(v1.m, v1.m, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(v2.m, v2.m, _MM_SHUFFLE(3, 1, 0, 2))),
+        _mm_mul_ps(_mm_shuffle_ps(v1.m, v1.m, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(v2.m, v2.m, _MM_SHUFFLE(3, 0, 2, 1))));
 }
-template <class T>
-void Vector4<T, true>::Length(T* out, Vector4<T>* v)
+void Vector4::Length(float& out, Vector4& v)
 {
-    *out = static_cast<T>(sqrt(v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w));
+    __m128 m = _mm_sqrt_ps(_mm_div_ps(v.m, v.m));
+    out = m.m128_f32[0] + m.m128_f32[1] + m.m128_f32[2] + m.m128_f32[3];
 }
-template <class T> 
-void Vector4<T, true>::Normalize(T* out, Vector4<T>* v)
+void Vector4::Normalize(Vector4& out, Vector4& v)
 {
-    T len;
-    Length(&len, v);
-    *out = *v / len;
+    float len;
+    Length(len, v);
+    out.m = _mm_div_ps(v.m, _mm_set1_ps(len));
 }
+
+#else
+
+void Vector4::Dot(float& out, Vector4& v1, Vector4& v2)
+{
+    out = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+}
+void Vector4::Cross(Vector4& out, Vector4& v1, Vector4& v2)
+{
+    out = Vector4(
+        v1.y * v2.z - v1.z * v2.y,
+        v1.z * v2.x - v1.x * v2.z,
+        v1.x * v2.y - v1.y * v2.x,
+        0.0f);
+}
+void Vector4::Length(float& out, Vector4& v)
+{
+    out = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
+}
+void Vector4::Normalize(Vector4& out, Vector4& v)
+{
+    float len;
+    Length(len, v);
+    out = v / len;
+}
+
+#endif
 
 // Casting
-template <class T> 
-Vector4<T, true>::operator T* ()
+Vector4::operator float* ()
 {
     return &x;
 }
-template <class T> 
-Vector4<T, true>::operator const T* () const
+Vector4::operator const float* () const
 {
     return &x;
 }
-
 
 #if CAN_BE_USED_SIMD
 
-// float
+Vector4::operator __m128* ()
+{
+    return &m;
+}
+
+
 // Assignment
-Vector4<float>& Vector4<float, true>::operator += (const Vector4<float>& v)
+Vector4& Vector4::operator += (const Vector4& v)
 {
     m = _mm_add_ps(m, v.m);
+    return *this;
 }
-Vector4<float>& Vector4<float, true>::operator -= (const Vector4<float>& v)
+Vector4& Vector4::operator -= (const Vector4& v)
 {
     m = _mm_sub_ps(m, v.m);
+    return *this;
 }
-Vector4<float>& Vector4<float, true>::operator *= (const Vector4<float>& v)
+Vector4& Vector4::operator *= (const Vector4& v)
 {
     m = _mm_mul_ps(m, v.m);
+    return *this;
 }
-Vector4<float>& Vector4<float, true>::operator /= (const Vector4<float>& v)
+Vector4& Vector4::operator /= (const Vector4& v)
 {
     m = _mm_div_ps(m, v.m);
+    return *this;
+}
+Vector4& Vector4::operator *= (const float f)
+{
+    m = _mm_mul_ps(m, _mm_set1_ps(f));
+    return *this;
+}
+Vector4& Vector4::operator /= (const float f)
+{
+    m = _mm_div_ps(m, _mm_set1_ps(f));
+    return *this;
 }
 
 // Binary
-Vector4<float> Vector4<float, true>::operator + (const Vector4<float>& v) const
+Vector4 Vector4::operator + (const Vector4& v) const
 {
     return Vector4(_mm_add_ps(m, v.m));
 }
-Vector4<float> Vector4<float, true>::operator - (const Vector4<float>& v) const
+Vector4 Vector4::operator - (const Vector4& v) const
 {
     return Vector4(_mm_sub_ps(m, v.m));
 }
-Vector4<float> Vector4<float, true>::operator * (const Vector4<float>& v) const
+Vector4 Vector4::operator * (const Vector4& v) const
 {
     return Vector4(_mm_mul_ps(m, v.m));
 }
-Vector4<float> Vector4<float, true>::operator / (const Vector4<float>& v) const
+Vector4 Vector4::operator / (const Vector4& v) const
 {
     return Vector4(_mm_div_ps(m, v.m));
 }
-
-
-// double
-// Assignment
-Vector4<double>& Vector4<double, true>::operator += (const Vector4<double>& v)
+Vector4 Vector4::operator * (const float f) const
 {
-
+    return Vector4(_mm_mul_ps(m, _mm_set1_ps(f)));
 }
-Vector4<double>& Vector4<double, true>::operator -= (const Vector4<double>& v)
+Vector4 Vector4::operator / (const float f) const
 {
-
-}
-Vector4<double>& Vector4<double, true>::operator *= (const Vector4<double>& v)
-{
-
-}
-Vector4<double>& Vector4<double, true>::operator /= (const Vector4<double>& v)
-{
-
-}
-
-// Binary
-Vector4<double> Vector4<double, true>::operator + (const Vector4<double>& v) const
-{
-
-}
-Vector4<double> Vector4<double, true>::operator - (const Vector4<double>& v) const
-{
-
-}
-Vector4<double> Vector4<double, true>::operator * (const Vector4<double>& v) const
-{
-
-}
-Vector4<double> Vector4<double, true>::operator / (const Vector4<double>& v) const
-{
-
-}
-
-
-// uint32_t
-// Assignment
-Vector4<uint32_t>& Vector4<uint32_t, true>::operator += (const Vector4<uint32_t>& v)
-{
-
-}
-Vector4<uint32_t>& Vector4<uint32_t, true>::operator -= (const Vector4<uint32_t>& v)
-{
-
-}
-Vector4<uint32_t>& Vector4<uint32_t, true>::operator *= (const Vector4<uint32_t>& v)
-{
-
-}
-Vector4<uint32_t>& Vector4<uint32_t, true>::operator /= (const Vector4<uint32_t>& v)
-{
-
-}
-
-// Binary
-Vector4<uint32_t> Vector4<uint32_t, true>::operator + (const Vector4<uint32_t>& v) const
-{
-
-}
-Vector4<uint32_t> Vector4<uint32_t, true>::operator - (const Vector4<uint32_t>& v) const
-{
-
-}
-Vector4<uint32_t> Vector4<uint32_t, true>::operator * (const Vector4<uint32_t>& v) const
-{
-
-}
-Vector4<uint32_t> Vector4<uint32_t, true>::operator / (const Vector4<uint32_t>& v) const
-{
-
-}
-
-
-// uint64_t
-// Assignment
-Vector4<uint64_t>& Vector4<uint64_t, true>::operator += (const Vector4<uint64_t>& v)
-{
-
-}
-Vector4<uint64_t>& Vector4<uint64_t, true>::operator -= (const Vector4<uint64_t>& v)
-{
-
-}
-Vector4<uint64_t>& Vector4<uint64_t, true>::operator *= (const Vector4<uint64_t>& v)
-{
-
-}
-Vector4<uint64_t>& Vector4<uint64_t, true>::operator /= (const Vector4<uint64_t>& v)
-{
-
-}
-
-// Binary
-Vector4<uint64_t> Vector4<uint64_t, true>::operator + (const Vector4<uint64_t>& v) const
-{
-
-}
-Vector4<uint64_t> Vector4<uint64_t, true>::operator - (const Vector4<uint64_t>& v) const
-{
-
-}
-Vector4<uint64_t> Vector4<uint64_t, true>::operator * (const Vector4<uint64_t>& v) const
-{
-
-}
-Vector4<uint64_t> Vector4<uint64_t, true>::operator / (const Vector4<uint64_t>& v) const
-{
-
+    return Vector4(_mm_mul_ps(m, _mm_set1_ps(f)));
 }
 
 #else
 
 // Assignment
-template <class T>
-Vector4<T>& Vector4<T, true>::operator += (const Vector4<T>& v)
+Vector4& Vector4::operator += (const Vector4& v)
 {
-
+    return *this = Vector4(x + v.x, y + v.y, z + v.z, w + v.w);
 }
-template <class T>
-Vector4<T>& Vector4<T, true>::operator -= (const Vector4<T>& v)
+Vector4& Vector4::operator -= (const Vector4& v)
 {
-
+    return *this = Vector4(x - v.x, y - v.y, z - v.z, w - v.w);
 }
-template <class T>
-Vector4<T>& Vector4<T, true>::operator *= (const Vector4<T>& v)
+Vector4& Vector4::operator *= (const Vector4& v)
 {
-
+    return *this = Vector4(x * v.x, y * v.y, z * v.z, w * v.w);
 }
-template <class T>
-Vector4<T>& Vector4<T, true>::operator /= (const Vector4<T>& v)
+Vector4& Vector4::operator /= (const Vector4& v)
 {
-
+    return *this = Vector4(x / v.x, y / v.y, z / v.z, w / v.w);
+}
+Vector4& Vector4::operator *= (const float f)
+{
+    return *this = Vector4(x * f, y * f, z * f, w * f);
+}
+Vector4& Vector4::operator /= (const float f)
+{
+    return *this = Vector4(x / f, y / f, z / f, w / f);
 }
 
 // Binary
-template <class T>
-Vector4<T> Vector4<T, true>::operator + (const Vector4<T>& v) const
+Vector4 Vector4::operator + (const Vector4& v) const
 {
-
+    return Vector4(x + v.x, y + v.y, z + v.z, w + v.w);
 }
-template <class T>
-Vector4<T> Vector4<T, true>::operator - (const Vector4<T>& v) const
+Vector4 Vector4::operator - (const Vector4& v) const
 {
-
+    return Vector4(x - v.x, y - v.y, z - v.z, w - v.w);
 }
-template <class T>
-Vector4<T> Vector4<T, true>::operator * (const Vector4<T>& v) const
+Vector4 Vector4::operator * (const Vector4& v) const
 {
-
+    return Vector4(x * v.x, y * v.y, z * v.z, w * v.w);
 }
-template <class T>
-Vector4<T> Vector4<T, true>::operator / (const Vector4<T>& v) const
+Vector4 Vector4::operator / (const Vector4& v) const
 {
-
+    return Vector4(x / v.x, y / v.y, z / v.z, w / v.w);
+}
+Vector4 Vector4::operator * (const float f) const
+{
+    return Vector4(x * f, y * f, z * f, w * f);
+}
+Vector4 Vector4::operator / (const float f) const
+{
+    return Vector4(x / f, y / f, z / f, w / f);
 }
 
 #endif
