@@ -39,7 +39,7 @@ void Window::Initialize(uint32_t width, uint32_t height, TCHAR* windowName)
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		(width + GetSystemMetrics(SM_CXDLGFRAME) * 2),
+		(width  + GetSystemMetrics(SM_CXDLGFRAME) * 2),
 		(height + GetSystemMetrics(SM_CXDLGFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION)),
 		NULL,
 		NULL,

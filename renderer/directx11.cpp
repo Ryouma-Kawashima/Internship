@@ -47,48 +47,38 @@ void DirectX11::Initialize(Window& window)
     };
 
 
-    //for (int i = 0; i < 3; i++)
-    //{
-    //    hr = D3D11CreateDevice(
-    //        nullptr,
-    //        driverType[i],
-    //        nullptr,
-    //        0,
-    //        featureLevels,
-    //        2,
-    //        D3D11_SDK_VERSION,
-    //        &m_Device,
-    //        &m_FeatureLevel,
-    //        &m_DeviceContext);
-    //
-    //    if (SUCCEEDED(hr))
-    //    {
-    //        break;
-    //    }
-    //}
+    for (int i = 0; i < 3; i++)
+    {
+        hr = D3D11CreateDeviceAndSwapChain(
+            nullptr,
+            D3D_DRIVER_TYPE_HARDWARE,
+            nullptr,
+            0,
+            featureLevels,
+            2,
+            D3D11_SDK_VERSION,
+            &swapChainDesc,
+            &m_SwapChain,
+            &m_Device,
+            &m_FeatureLevel,
+            &m_DeviceContext);
+    
+        if (SUCCEEDED(hr))
+        {
+            break;
+        }
+    }
+    assert(m_Device);
+    assert(m_DeviceContext);
+    assert(m_SwapChain);
 
-    hr = D3D11CreateDeviceAndSwapChain(
-        nullptr,
-        D3D_DRIVER_TYPE_HARDWARE,
-        nullptr,
-        0,
-        featureLevels,
-        2,
-        D3D11_SDK_VERSION,
-        &swapChainDesc,
-        &m_SwapChain,
-        &m_Device,
-        &m_FeatureLevel,
-        &m_DeviceContext);
-
-    /*
     // レンダーターゲットビューの作成
     ID3D11Texture2D* renderTarget = nullptr;
     m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&renderTarget);
     assert(renderTarget);
 
     m_Device->CreateRenderTargetView(renderTarget, nullptr, &m_RenderTargetView);
-    //renderTarget->Release();
+    renderTarget->Release();
 
 
     // デプスステンシルバッファ作成
@@ -114,7 +104,7 @@ void DirectX11::Initialize(Window& window)
     depthStencilViewDesc.ViewDimension  = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.Flags          = 0;
     m_Device->CreateDepthStencilView(depthStencil, &depthStencilViewDesc, &m_DepthStencilView);
-    //depthStencil->Release();
+    depthStencil->Release();
 
     m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView.Get());
 
@@ -171,7 +161,7 @@ void DirectX11::Initialize(Window& window)
 
     m_Device->CreateDepthStencilState(&depthStencilDesc, &m_DepthStateEnable);//深度有効ステート
 
-    //depthStencilDesc.DepthEnable = FALSE;
+    depthStencilDesc.DepthEnable = FALSE;
     depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
     m_Device->CreateDepthStencilState(&depthStencilDesc, &m_DepthStateDisable);//深度無効ステート
 
@@ -190,7 +180,6 @@ void DirectX11::Initialize(Window& window)
 
     m_DeviceContext->PSSetSamplers(0, 1, &samplerState);
 
-    */
 
     /*
     // 定数バッファ生成
@@ -245,18 +234,7 @@ void DirectX11::Initialize(Window& window)
 }
 void DirectX11::Finalize()
 {
-    //SAFE_RELEASE(m_Device);
-    //SAFE_RELEASE(m_DeviceContext);
-    //SAFE_RELEASE(m_SwapChain);
-    //SAFE_RELEASE(m_RenderTargetView);
-    //SAFE_RELEASE(m_DepthStencilView);
-    //SAFE_RELEASE(m_WorldBuffer);
-    //SAFE_RELEASE(m_ViewBuffer);
-    //SAFE_RELEASE(m_ProjectionBuffer);
-    //SAFE_RELEASE(m_MaterialBuffer);
-    //SAFE_RELEASE(m_LightBuffer);
-    //SAFE_RELEASE(m_DepthStateEnable);
-    //SAFE_RELEASE(m_DepthStateDisable);
+
 }
 
 void DirectX11::Begin()

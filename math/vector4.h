@@ -20,8 +20,8 @@ namespace DragonLib
     template <class T>
     class Vector4<T, true>
     {
-        Vector4(const float* a);
-        Vector4(T x, T y);
+        Vector4(const T* a);
+        Vector4(T x, T y, T z, T w);
 
         // Calc
         static void Dot(Vector4<T>*out, Vector4<T>*v1, Vector4<T>*v2);
@@ -58,6 +58,10 @@ namespace DragonLib
             __m128 m; // float[4]
             #endif
         };
+
+        #if CAN_BE_USED_SIMD
+        operator __m128* () { return m; };
+        #endif
     };
 
     template <>
@@ -72,6 +76,10 @@ namespace DragonLib
             __m256d m; // double[4]
             #endif
         };
+
+        #if CAN_BE_USED_SIMD
+        operator __m256d* () { return m; };
+        #endif
     };
 
     template <>
@@ -86,6 +94,10 @@ namespace DragonLib
             __m128i m; // uint32_t[4] 
             #endif
         };
+
+        #if CAN_BE_USED_SIMD
+        operator __m128i* () { return m; };
+        #endif
     };
 
     template <>
@@ -100,5 +112,9 @@ namespace DragonLib
             __m256i m; // uint64_t[4] 
             #endif
         };
+
+        #if CAN_BE_USED_SIMD
+        operator __m256i* () { return m; };
+        #endif
     };
 }
