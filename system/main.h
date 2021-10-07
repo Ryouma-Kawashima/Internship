@@ -4,6 +4,8 @@
 #include <cassert>
 #include <ctgmath> // Template Generic Math
 #include <map>
+#include <string>
+#include <list>
 
 // ˆË‘¶‚È‚µ “Æ©ƒwƒbƒ_[
 #include "../utility/debug_printf.h"

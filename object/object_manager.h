@@ -12,7 +12,7 @@ namespace DragonLib
         void RemoveObject(Object* object);
         void ClearObjects();
 
-    protected:
-        
+    private:
+        std::map<std::string, Object*> m_Objects;
     };
 }
