@@ -8,6 +8,7 @@
 // 依存なし 独自ヘッダー
 #include "../utility/debug_printf.h"
 #include "../utility/static_polymorphism.h"
+#include "../utility/singleton.h"
 
 // 優先度 最高
 #include "../utility/param.h"

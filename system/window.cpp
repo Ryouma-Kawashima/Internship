@@ -5,7 +5,7 @@
 
 using namespace DragonLib;
 
-void Window::Initialize(uint32_t width, uint32_t height, TCHAR* windowName)
+void Window::Initialize(float width, float height, TCHAR* windowName)
 {
 	m_hInstance = GetModuleHandle(NULL);
 	assert(m_hInstance);
@@ -39,8 +39,8 @@ void Window::Initialize(uint32_t width, uint32_t height, TCHAR* windowName)
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		(width  + GetSystemMetrics(SM_CXDLGFRAME) * 2),
-		(height + GetSystemMetrics(SM_CXDLGFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION)),
+		(static_cast<int>(width)  + GetSystemMetrics(SM_CXDLGFRAME) * 2),
+		(static_cast<int>(height) + GetSystemMetrics(SM_CXDLGFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION)),
 		NULL,
 		NULL,
 		m_hInstance,
@@ -56,13 +56,13 @@ void Window::Finalize()
 	UnregisterClass(CLASS_NAME, m_WindowClass.hInstance);
 }
 
-void Window::SetWindowSize(uint32_t width, uint32_t height)
+void Window::SetWindowSize(float width, float height)
 {
 	UNREFERENCED_PARAMETER(width);
 	UNREFERENCED_PARAMETER(height);
 }
 
-void Window::SetWindowPosition(uint32_t width, uint32_t height)
+void Window::SetWindowPosition(float width, float height)
 {
 	UNREFERENCED_PARAMETER(width);
 	UNREFERENCED_PARAMETER(height);
@@ -74,15 +74,15 @@ void Window::SetWindowShow(int32_t cmdShow)
 	UpdateWindow(m_hWnd);
 }
 
-HWND Window::GetHandle()
+void* Window::GetHandle()
 {
 	return m_hWnd;
 }
-uint32_t Window::GetWidth()
+float Window::GetWidth()
 {
 	return m_Width;
 }
-uint32_t Window::GetHeight()
+float Window::GetHeight()
 {
 	return m_Height;
 }

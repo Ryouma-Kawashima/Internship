@@ -60,9 +60,6 @@
     <ClInclude Include="system\manager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="math\vector2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="math\vector4.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -70,6 +67,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="math\matrix4x4.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="object\object.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="object\object_manager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,9 +104,6 @@
     <ClCompile Include="system\manager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="math\vector2.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="math\vector4.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -116,5 +116,18 @@
     <ClCompile Include="math\matrix4x4.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="object\object.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="object\object_manager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shader\common.hlsl" />
+    <FxCompile Include="shader\unlitTexturePS.hlsl" />
+    <FxCompile Include="shader\unlitTextureVS.hlsl" />
+    <FxCompile Include="shader\vertexLightingPS.hlsl" />
+    <FxCompile Include="shader\vertexLightingVS.hlsl" />
   </ItemGroup>
 </Project>

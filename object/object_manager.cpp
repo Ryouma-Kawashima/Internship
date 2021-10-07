@@ -4,3 +4,5 @@
 #include "../system/config.h"
 
 #include "object.h"
+
+#include "object_manager.h"
