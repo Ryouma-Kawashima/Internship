@@ -2,5 +2,5 @@
 
 namespace DragonLib
 {
-
+    class GameObject : public;
 }

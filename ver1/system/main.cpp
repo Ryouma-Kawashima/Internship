@@ -10,7 +10,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCm
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );
 
-
+	
 	Window window;
 	window.Initialize( WINDOW_WIDTH, WINDOW_HEIGHT );
 	window.SetWindowShow( nCmdShow );
