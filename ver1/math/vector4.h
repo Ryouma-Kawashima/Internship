@@ -10,8 +10,14 @@ namespace DragonLib
     {
         union
         {
-            float x, y, z, w;
-            float r, g, b, a;
+            struct
+            {
+                float x, y, z, w;
+            };
+            struct
+            {
+                float r, g, b, a;
+            };
 
             #if CAN_BE_USED_SIMD
             __m128 m; // float[4]

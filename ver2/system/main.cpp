@@ -7,17 +7,17 @@
 // 
 // ------------------------------
 
+#include <array>
 
-#include "../utility/debug_printf.h"
 #include "../utility/static_polymorphism.h"
-#include "../utility/parameter.h"
-#include "../system/config.h"
+#include "../utility/debug_printf.h"
+#include "../utility/singleton.h"
 #include "../utility/timer.h"
+#include "../utility/parameter.h"
 
-#include "../window/window_api.h"
-#include "../render/render_api.h"
-
-#include <cassert>
+#include "../system/config.h"
+#include "../system/system_timer.h"
+#include "../system/manager.h"
 
 using namespace DragonLib;
 
@@ -28,21 +28,19 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCmdL
 	UNREFERENCED_PARAMETER(hInstance);
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
 
-	WindowAPI window;
-	RenderAPI render;
+	Singleton<Manager>::Create();
+	Singleton<SystemTimer>::Create();
 
-	window.Initialize( WINDOW_WIDTH, WINDOW_HEIGHT );
-	render.Initialize();
+	Manager* manager = Singleton<Manager>::GetInstance();
+	manager->Initialize();
 
-	window.Show(nCmdShow);
-	window.Update();
-
-	
-	uint32_t tickCount = 0;
-	Timer execTimer, debugTimer;
-	execTimer.Start();
-	debugTimer.Start();
+	SystemTimer* timer = Singleton<SystemTimer>::GetInstance();
+	timer->ResetPhysicsTimer();
+	timer->ResetUpdateTimer();
+	timer->ResetDrawTimer();
+	timer->ResetDebugTimer();
 
 	timeBeginPeriod(1);
 
@@ -63,33 +61,41 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCmdL
 		}
 		else
 		{
-			execTimer.Stop();
+			bool waitFlag = true;
 
-			if (execTimer.GetElapsedTime<NanoSeconds>() > EXEC_WAIT_TIME)
+			if (timer->CheckPhysicsTimer())
 			{
-				execTimer.Start();
-				tickCount++;
-
-				// FPS‚ÌŒv‘ª
-				#if defined( __DEBUG ) || defined( _DEBUG )
-
-				if (execTimer.GetStartTime<NanoSeconds>() > 
-					debugTimer.GetStartTime<NanoSeconds>() + DEBUG_WAIT_TIME)
+				do
 				{
-					DebugPrintf("FPS: %ld\n", tickCount * DEBUG_PER_SECOND);
+					manager->Physics();
 
-					debugTimer = execTimer;
-					tickCount = 0;
-				}
+				} while (timer->CheckPhysicsTimer());
 
-				#endif
-
-
-				render.Begin();
-				render.End();
-
+				timer->ResetPhysicsTimer();
+				waitFlag = false;
 			}
-			else
+			if (timer->CheckUpdateTimer())
+			{
+				manager->Update();
+				timer->ResetUpdateTimer();
+				waitFlag = false;
+			}
+			if (timer->CheckDrawTimer())
+			{
+				manager->Draw();
+				timer->ResetDrawTimer();
+				waitFlag = false;
+			}
+			#if defined( __DEBUG ) || defined( _DEBUG )
+			if (timer->CheckDebugTimer())
+			{
+				manager->Debug();
+				timer->ResetDebugTimer();
+				waitFlag = false;
+			}
+			#endif
+
+			if(waitFlag)
 			{
 				#if USE_PAUSE
 				for (uint32_t i = 0; i < PAUSE_LOOP_NUM; i++)
@@ -106,9 +112,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR* lpCmdL
 	}
 
 	timeEndPeriod(1);
-	
-	render.Finalize();
-	window.Finalize();
+
+	manager->Finalize();
+
+	Singleton<Timer>::Destroy();
+	Singleton<Manager>::Destroy();
 
 	return 0;
 }

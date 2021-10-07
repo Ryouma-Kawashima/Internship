@@ -11,8 +11,6 @@
 #include <windows.h>
 #pragma comment(lib, "winmm.lib")
 
-#include "window_base.h"
-
 namespace DragonLib
 {
     class Windows : public WindowBase

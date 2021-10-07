@@ -8,6 +8,8 @@
 // 
 // ------------------------------
 
+#include "window_base.h"
+
 #if USE_WINDOWS
 #include "windows.h"
 #else
@@ -44,15 +46,15 @@ namespace DragonLib
 
         void* GetHandle()
         {
-            m_Window.GetHandle();
+            return m_Window.GetHandle();
         }
         float GetWidth()
         {
-            m_Window.GetWidth();
+            return m_Window.GetWidth();
         }
         float GetHeight()
         {
-            m_Window.GetHeight();
+            return m_Window.GetHeight();
         }
 
     private:
@@ -60,6 +62,6 @@ namespace DragonLib
     };
 
     #if USE_WINDOWS
-    typedef Window<Windows> WindowAPI;
+    using WindowAPI = Window<Windows>;
     #endif
 }

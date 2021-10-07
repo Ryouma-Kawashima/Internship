@@ -7,8 +7,15 @@
 // 
 // ------------------------------
 
-#include "windows.h"
+#include "../utility/parameter.h"
 #include "../system/config.h"
+
+#include "window_base.h"
+
+#include <windows.h>
+#pragma comment(lib, "winmm.lib")
+
+#include "windows.h"
 #include <cassert>
 
 using namespace DragonLib;

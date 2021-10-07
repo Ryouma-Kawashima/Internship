@@ -8,13 +8,7 @@
 // 
 // ------------------------------
 
-#include "../utility/static_polymorphism.h"
-#include "../utility/parameter.h"
-#include "../system/config.h"
-
 #include "render_base.h"
-
-#include "../window/window_api.h"
 
 #if USE_DIRECTX11
 #include "directx11.h"
@@ -32,9 +26,9 @@ namespace DragonLib
         class Render
     {
     public:
-        void Initialize()
+        void Initialize(WindowAPI* window)
         {
-            m_Renderer.Initialize(WindowAPI* window);
+            m_Renderer.Initialize(window);
         }
         void Finalize()
         {
@@ -55,8 +49,8 @@ namespace DragonLib
     };
 
     #if USE_DIRECTX11
-    typedef Render<DirectX11> RenderAPI;
+    using RenderAPI = Render<DirectX11>;
     #elif USE_DIRECTX12
-    typedef Render<DirectX12> RenderAPI;
+    using RenderAPI = Render<DirectX12>;
     #endif
 }

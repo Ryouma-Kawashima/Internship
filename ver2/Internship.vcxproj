@@ -88,6 +88,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,6 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,6 +120,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,6 +136,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +148,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="render\directx11.cpp" />
+    <ClCompile Include="render\render_api.cpp" />
+    <ClCompile Include="system\manager.cpp" />
+    <ClCompile Include="system\system_timer.cpp" />
     <ClCompile Include="utility\debug_printf.cpp" />
     <ClCompile Include="utility\timer.cpp" />
     <ClCompile Include="window\windows.cpp" />
@@ -147,13 +158,18 @@
     <ClCompile Include="window\window_api.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="math\matrix4x4.h" />
+    <ClInclude Include="math\simd.h" />
     <ClInclude Include="render\render_base.h" />
     <ClInclude Include="system\config.h" />
     <ClInclude Include="render\directx11.h" />
     <ClInclude Include="render\directx12.h" />
+    <ClInclude Include="system\manager.h" />
+    <ClInclude Include="system\system_timer.h" />
     <ClInclude Include="utility\debug_printf.h" />
     <ClInclude Include="utility\parameter.h" />
     <ClInclude Include="render\render_api.h" />
+    <ClInclude Include="utility\singleton.h" />
     <ClInclude Include="utility\static_polymorphism.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="window\window_api.h" />

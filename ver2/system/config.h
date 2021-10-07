@@ -39,10 +39,17 @@ namespace DragonLib
     // System Timer
     constexpr uint64_t FPS = 60;
 
-    constexpr uint64_t TIMER_FREQUENCY  = 1000000000; // nanoseconds
-    constexpr uint64_t DEBUG_FREQUENCY  = 1000000000; // nanoseconds
+    constexpr uint64_t PHYSICS_PER_SECOND   = 20;
+    constexpr uint64_t UPDATE_PER_SECOND    = 120;
+    constexpr uint64_t DRAW_PER_SECOND      = FPS;
+    constexpr uint64_t DEBUG_PER_SECOND     = 1;
 
-    constexpr uint64_t EXEC_WAIT_TIME   = TIMER_FREQUENCY / FPS;
-    constexpr uint64_t DEBUG_WAIT_TIME  = DEBUG_FREQUENCY;
-    constexpr uint64_t DEBUG_PER_SECOND = TIMER_FREQUENCY / TIMER_FREQUENCY;
+    constexpr uint64_t TIMER_FREQUENCY      = 1000000000; // nanoseconds
+
+    constexpr uint64_t PHYSICS_WAIT_TIME    = TIMER_FREQUENCY / PHYSICS_PER_SECOND;
+    constexpr uint64_t UPDATE_WAIT_TIME     = TIMER_FREQUENCY / UPDATE_PER_SECOND;
+    constexpr uint64_t DRAW_WAIT_TIME       = TIMER_FREQUENCY / DRAW_PER_SECOND;
+    constexpr uint64_t DEBUG_WAIT_TIME      = TIMER_FREQUENCY / DEBUG_PER_SECOND;
+
+    constexpr float PHYSICS_DELTA_TIME      = PHYSICS_WAIT_TIME / TIMER_FREQUENCY;
 }

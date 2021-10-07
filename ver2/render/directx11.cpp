@@ -59,6 +59,10 @@ void DirectX11::Initialize(WindowAPI* window)
 
 
 
+
+
+
+    m_Window = window;
 }
 void DirectX11::Finalize()
 {
