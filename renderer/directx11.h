@@ -14,40 +14,32 @@
 
 namespace DragonLib
 {
-    
-
     struct Vertex3D
     {
-        DirectX::XMFLOAT3 Position;
-        DirectX::XMFLOAT3 Normal;
-        DirectX::XMFLOAT3 Diffuse;
-        DirectX::XMFLOAT3 TexCoord;
+        DirectX::XMFLOAT3   Position;
+        DirectX::XMFLOAT3   Normal;
+        DirectX::XMFLOAT3   Diffuse;
+        DirectX::XMFLOAT3   TexCoord;
     };
-
-
 
     struct Material
     {
-        DirectX::XMFLOAT4 Ambient;
-        DirectX::XMFLOAT4 Diffuse;
-        DirectX::XMFLOAT4 Speculaar;
-        DirectX::XMFLOAT4 Emission;
-        float		Shininess;
-        float		Dummy[3];
+        DirectX::XMFLOAT4   Ambient;
+        DirectX::XMFLOAT4   Diffuse;
+        DirectX::XMFLOAT4   Speculaar;
+        DirectX::XMFLOAT4   Emission;
+        float		        Shininess;
+        float		        Dummy[3];
     };
-
-
 
     struct Light
     {
-        bool		Enable;
-        bool		Dummy[3];
-        DirectX::XMVECTOR Direction;
-        DirectX::XMFLOAT4 Diffuse;
-        DirectX::XMFLOAT4 Ambient;
+        bool		        Enable;
+        bool		        Dummy[3];
+        DirectX::XMVECTOR   Direction;
+        DirectX::XMFLOAT4   Diffuse;
+        DirectX::XMFLOAT4   Ambient;
     };
-
-
 
     class DirectX11 : public RenderBase
     {

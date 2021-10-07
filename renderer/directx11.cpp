@@ -22,8 +22,8 @@ void DirectX11::Initialize(Window* window)
     // デバイス、スワップチェーンの作成
     DXGI_SWAP_CHAIN_DESC swapChainDesc{};
     swapChainDesc.BufferCount                           = 1;
-    swapChainDesc.BufferDesc.Width                      = static_cast<UINT>( window->GetWidth() );
-    swapChainDesc.BufferDesc.Height                     = static_cast<UINT>( window->GetHeight() );
+    swapChainDesc.BufferDesc.Width                      = static_cast<unsigned int>( window->GetWidth() );
+    swapChainDesc.BufferDesc.Height                     = static_cast<unsigned int>( window->GetHeight() );
     swapChainDesc.BufferDesc.Format                     = DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferDesc.RefreshRate.Numerator      = FPS;
     swapChainDesc.BufferDesc.RefreshRate.Denominator    = 1;
@@ -48,10 +48,11 @@ void DirectX11::Initialize(Window* window)
         D3D_DRIVER_TYPE_HARDWARE,
         D3D_DRIVER_TYPE_WARP,
         D3D_DRIVER_TYPE_REFERENCE,
+        D3D_DRIVER_TYPE_SOFTWARE,
     };
 
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         hr = D3D11CreateDeviceAndSwapChain(
             nullptr,
@@ -83,7 +84,7 @@ void DirectX11::Initialize(Window* window)
     m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&renderTarget));
     assert(renderTarget);
 
-    m_Device->CreateRenderTargetView(renderTarget, nullptr, &m_RenderTargetView);
+    m_Device->CreateRenderTargetView(renderTarget, nullptr, m_RenderTargetView.GetAddressOf());
     renderTarget->Release();
 
 
@@ -109,10 +110,10 @@ void DirectX11::Initialize(Window* window)
     depthStencilViewDesc.Format         = textureDesc.Format;
     depthStencilViewDesc.ViewDimension  = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.Flags          = 0;
-    m_Device->CreateDepthStencilView(depthStencil, &depthStencilViewDesc, &m_DepthStencilView);
+    m_Device->CreateDepthStencilView(depthStencil, &depthStencilViewDesc, m_DepthStencilView.GetAddressOf());
     depthStencil->Release();
 
-    m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView.Get());
+    m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 
 
     // ビューポート設定
@@ -165,11 +166,11 @@ void DirectX11::Initialize(Window* window)
     depthStencilDesc.DepthFunc      = D3D11_COMPARISON_LESS_EQUAL;
     depthStencilDesc.StencilEnable  = false;
 
-    m_Device->CreateDepthStencilState(&depthStencilDesc, &m_DepthStateEnable);//深度有効ステート
+    m_Device->CreateDepthStencilState(&depthStencilDesc, m_DepthStateEnable.GetAddressOf());//深度有効ステート
 
     depthStencilDesc.DepthEnable = false;
     depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-    m_Device->CreateDepthStencilState(&depthStencilDesc, &m_DepthStateDisable);//深度無効ステート
+    m_Device->CreateDepthStencilState(&depthStencilDesc, m_DepthStateDisable.GetAddressOf());//深度無効ステート
 
     m_DeviceContext->OMSetDepthStencilState(m_DepthStateEnable.Get(), 0U);
 
@@ -196,27 +197,27 @@ void DirectX11::Initialize(Window* window)
     bufferDesc.MiscFlags            = 0;
     bufferDesc.StructureByteStride  = sizeof(float);
 
-    m_Device->CreateBuffer(&bufferDesc, nullptr, &m_WorldBuffer);
-    m_DeviceContext->VSSetConstantBuffers(0, 1, &m_WorldBuffer);
+    m_Device->CreateBuffer(&bufferDesc, nullptr, m_WorldBuffer.GetAddressOf());
+    m_DeviceContext->VSSetConstantBuffers(0, 1, m_WorldBuffer.GetAddressOf());
 
-    m_Device->CreateBuffer(&bufferDesc, nullptr, &m_ViewBuffer);
-    m_DeviceContext->VSSetConstantBuffers(1, 1, &m_ViewBuffer);
+    m_Device->CreateBuffer(&bufferDesc, nullptr, m_ViewBuffer.GetAddressOf());
+    m_DeviceContext->VSSetConstantBuffers(1, 1, m_ViewBuffer.GetAddressOf());
 
-    m_Device->CreateBuffer(&bufferDesc, nullptr, &m_ProjectionBuffer);
-    m_DeviceContext->VSSetConstantBuffers(2, 1, &m_ProjectionBuffer);
+    m_Device->CreateBuffer(&bufferDesc, nullptr, m_ProjectionBuffer.GetAddressOf());
+    m_DeviceContext->VSSetConstantBuffers(2, 1, m_ProjectionBuffer.GetAddressOf());
 
 
     bufferDesc.ByteWidth = sizeof(Material);
 
-    m_Device->CreateBuffer(&bufferDesc, nullptr, &m_MaterialBuffer);
-    m_DeviceContext->VSSetConstantBuffers(3, 1, &m_MaterialBuffer);
+    m_Device->CreateBuffer(&bufferDesc, nullptr, m_MaterialBuffer.GetAddressOf());
+    m_DeviceContext->VSSetConstantBuffers(3, 1, m_MaterialBuffer.GetAddressOf());
 
 
     bufferDesc.ByteWidth = sizeof(Light);
 
-    m_Device->CreateBuffer(&bufferDesc, nullptr, &m_LightBuffer);
-    m_DeviceContext->VSSetConstantBuffers(4, 1, &m_LightBuffer);
-    m_DeviceContext->PSSetConstantBuffers(4, 1, &m_LightBuffer);
+    m_Device->CreateBuffer(&bufferDesc, nullptr, m_LightBuffer.GetAddressOf());
+    m_DeviceContext->VSSetConstantBuffers(4, 1, m_LightBuffer.GetAddressOf());
+    m_DeviceContext->PSSetConstantBuffers(4, 1, m_LightBuffer.GetAddressOf());
 
 
     // ライト初期化
@@ -256,11 +257,11 @@ void DirectX11::SetDepthEnable(bool enable)
 {
     if (enable)
     {
-        m_DeviceContext->OMSetDepthStencilState(m_DepthStateEnable.Get(), 0U);
+        m_DeviceContext->OMSetDepthStencilState(m_DepthStateEnable.Get(), 0);
     }
     else
     {
-        m_DeviceContext->OMSetDepthStencilState(m_DepthStateDisable.Get(), 0U);
+        m_DeviceContext->OMSetDepthStencilState(m_DepthStateDisable.Get(), 0);
     }
 }
 
@@ -350,8 +351,6 @@ void DirectX11::CreateVertexShader(ID3D11VertexShader** vertexShader, ID3D11Inpu
 
     _freea(buffer);
 }
-
-
 
 void DirectX11::CreatePixelShader(ID3D11PixelShader** pixelShader, const char* fileName)
 {
