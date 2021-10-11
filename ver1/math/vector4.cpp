@@ -69,7 +69,7 @@ void Vector4::Dot(float& out, Vector4& v0, Vector4& v1)
     #ifdef _INCLUDED_SMM // SSE3
     out = _mm_dp_ps(v0.m, v1.m, 0xFF).m128_f32[0];
     #else
-    __m128 m = _mm_mul_ps(v0.m, v1.m);
+    __m128 m = _mm_mul_ps(v0.m, v1.m);                                                       
     out = m.m128_f32[0] + m.m128_f32[1] + m.m128_f32[2] + m.m128_f32[3];
     #endif
 }

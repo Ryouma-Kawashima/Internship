@@ -5,6 +5,7 @@ namespace DragonLib
     // Prototype
     class Object;
 
+    /*
     class ObjectManager
     {
     public:
@@ -15,4 +16,5 @@ namespace DragonLib
     private:
         std::map<std::string, Object*> m_Objects;
     };
+    */
 }

@@ -12,6 +12,8 @@
 
 using namespace DragonLib;
 
+/*
+
 void ObjectManager::AppendObject(Object* object)
 {
     assert(m_Objects[object->GetID()] != nullptr);
@@ -28,3 +30,5 @@ void ObjectManager::ClearObjects()
 {
     m_Objects.clear();
 }
+
+*/

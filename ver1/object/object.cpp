@@ -9,6 +9,7 @@
 
 using namespace DragonLib;
 
+/*
 Object::Object(std::string id)
 {
     m_ObjectManager.AppendObject(this);
@@ -22,3 +23,4 @@ std::string Object::GetID()
 {
     return m_ObjectID;
 }
+*/

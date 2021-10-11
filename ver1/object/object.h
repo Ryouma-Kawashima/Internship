@@ -2,6 +2,7 @@
 
 namespace DragonLib
 {
+    /*
     class Object
     {
     public:
@@ -16,4 +17,5 @@ namespace DragonLib
         std::string m_ObjectID;
         static ObjectManager m_ObjectManager;
     };
+    */
 }
