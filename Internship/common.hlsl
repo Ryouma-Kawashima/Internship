@@ -2,24 +2,19 @@
 
 struct VS_IN
 {
-    float4 Position : POSITION0;
-    float4 Normal   : NORMAL0;
-    float4 Diffuse  : COLOR0;
-    float2 TexCoord : TEXCOORD0;
+    float4 Position : POSITION;
+    float4 Normal   : NORMAL;
+    float4 Diffuse  : COLOR;
+    float2 TexCoord : TEXCOORD;
 };
 
 struct PS_IN
 {
     float4 Position         : SV_POSITION;
-    float4 WorldPosition    : POSITION0;
-    float4 Normal           : NORMAL0;
-    float4 Diffuse          : COLOR0;
-    float2 TexCoord         : TEXCOORD0;
-};
-
-struct PS_OUT
-{
-    float4 Diffuse : SV_TARGET0;
+    float4 WorldPosition    : POSITION;
+    float4 Normal           : NORMAL;
+    float4 Diffuse          : COLOR;
+    float2 TexCoord         : TEXCOORD;
 };
 
 struct MATERIAL
@@ -41,6 +36,15 @@ struct LIGHT
     float4 Ambient;
 };
 
+cbuffer ConsntantBuffer : register(b1)
+{
+    matrix World;
+    matrix View;
+    matrix Projection;
+    matrix Dummy;
+}
+
+/*
 cbuffer WorldBuffer : register(b0)
 {
     matrix World;
@@ -65,4 +69,4 @@ cbuffer CameraBuffer : register(b5)
 {
     float4 CameraPosition;
 }
-
+*/
