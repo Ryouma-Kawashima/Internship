@@ -36,12 +36,18 @@ struct LIGHT
     float4 Ambient;
 };
 
+/*
 cbuffer ConsntantBuffer : register(b1)
 {
-    matrix World;
-    matrix View;
-    matrix Projection;
-    matrix Dummy;
+    matrix World        : packoffset(c0);
+    matrix View         : packoffset(c4);
+    matrix Projection   : packoffset(c8);
+}
+*/
+
+cbuffer WVPBuffer : register(b0)
+{
+    matrix WVP;
 }
 
 /*
