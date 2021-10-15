@@ -90,7 +90,8 @@ ComPtr<IDXGISwapChain3>				g_SwapChain;					// スワップチェイン
 ComPtr<ID3D12DescriptorHeap>		g_RtvHeap;						// レンダーターゲットビューのヒープ
 ComPtr<ID3D12DescriptorHeap>		g_DsvHeap;						// デプスステンシルビューのヒープ
 ComPtr<ID3D12DescriptorHeap>		g_CbvHeap;						// 定数バッファビューのヒープ
-ComPtr<ID3D12DescriptorHeap>		g_SrvHeap;						// シェーダーリソースビューのヒープ
+ComPtr<ID3D12DescriptorHeap>		g_SrvHeap;
+ComPtr<ID3D12DescriptorHeap>		g_CbvSrvHeap;						// シェーダーリソースビューのヒープ
 ComPtr<ID3D12Resource>				g_RenderTargets[BUFFER_COUNT];	// レンダーターゲットのバッファ
 ComPtr<ID3D12Resource>				g_DepthStencil;					// デプスステンシルのバッファ
 ComPtr<ID3D12RootSignature>			g_RootSignature;				// ルートシグネチャ
@@ -113,6 +114,10 @@ XMMATRIX*				g_CbvDataBegin;			// 定数バッファ(GPU)の仮想アドレス収納
 ComPtr<ID3D12Resource>		g_VertexBuffer;		// 頂点バッファ
 D3D12_VERTEX_BUFFER_VIEW	g_VertexBufferView;	// 頂点バッファビュー
 
+// インデックスバッファ
+ComPtr<ID3D12Resource>		g_IndexBuffer;
+D3D12_INDEX_BUFFER_VIEW		g_IndexBufferView;
+
 UINT64 g_FenceValue		= 0;
 HANDLE g_FenceEvent		= nullptr;
 HANDLE g_EventHandle	= nullptr;
@@ -123,7 +128,7 @@ D3D12_RECT		g_ScissorRect;
 UINT g_FrameIndex				= 0;
 UINT g_RtvDescriptorHeapSize	= 0;
 UINT g_DsvDescriptorHeapSize	= 0;
-UINT g_SrvDescriptorHeapSize	= 0;
+UINT g_CbvSrvDescriptorHeapSize	= 0;
 
 UINT64 g_Width	= 0;
 UINT   g_Height	= 0;
@@ -552,71 +557,6 @@ void InitializeDirectX12()
 			g_DsvHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 
-	// 頂点バッファの生成
-	{
-		// 頂点データ
-		Vertex3D vertices[] =
-		{
-			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f },  { 1.0f, 0.0f, 0.0f, 1.0f }  },
-			{ { -0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f },  { 0.0f, 1.0f, 0.0f, 1.0f }  },
-			{ {  0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f },  { 0.0f, 0.0f, 1.0f, 1.0f }  },
-			{ {  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  }
-		};
-
-		// ヒーププロパティの設定
-		D3D12_HEAP_PROPERTIES prop{};
-		prop.Type					= D3D12_HEAP_TYPE_UPLOAD;
-		prop.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		prop.MemoryPoolPreference	= D3D12_MEMORY_POOL_UNKNOWN;
-		prop.CreationNodeMask		= 1;
-		prop.VisibleNodeMask		= 1;
-
-		// リソースの設定
-		D3D12_RESOURCE_DESC desc{};
-		desc.Dimension			= D3D12_RESOURCE_DIMENSION_BUFFER;
-		desc.Alignment			= 0;
-		desc.Width				= sizeof(vertices);
-		desc.Height				= 1;
-		desc.DepthOrArraySize	= 1;
-		desc.MipLevels			= 1;
-		desc.Format				= DXGI_FORMAT_UNKNOWN;
-		desc.SampleDesc.Count	= 1;
-		desc.SampleDesc.Quality	= 0;
-		desc.Layout				= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
-
-		// リソースの生成
-		hr = g_Device->CreateCommittedResource(
-			&prop,
-			D3D12_HEAP_FLAG_NONE,
-			&desc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(&g_VertexBuffer));
-		assert(SUCCEEDED(hr));
-
-		// マップ
-		Vertex3D* pData;
-		hr = g_VertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
-		assert(SUCCEEDED(hr));
-
-		// 頂点データのコピー
-		//memcpy(pData, vertices, sizeof(vertices));
-
-		for (int i = 0; i < 4; i++)
-		{
-			pData[i] = vertices[i];
-		}
-
-		// アンマップ
-		g_VertexBuffer->Unmap(0, nullptr);
-
-		// 頂点バッファビューの設定
-		g_VertexBufferView.BufferLocation	= g_VertexBuffer->GetGPUVirtualAddress();
-		g_VertexBufferView.StrideInBytes	= sizeof(Vertex3D);
-		g_VertexBufferView.SizeInBytes		= sizeof(vertices);
-	}
-
 	// 定数バッファ用のディスクリプターヒープの生成
 	{
 		CreateConstantBufferDiscriptorHeap();
@@ -662,53 +602,84 @@ void InitializeDirectX12()
 		light.Direction	= { 0.0f, -0.3f, -0.7f, 0.0f };
 
 		// 定数バッファデータの設定
-		/*
-		g_ConstantBufferData.World		= XMMatrixIdentity();
-		g_ConstantBufferData.View		= XMMatrixLookAtLH(eye, at, up);
+		//g_ConstantBufferData.World		= XMMatrixIdentity();
+		//g_ConstantBufferData.View		= XMMatrixLookAtLH(eye, at, up);
 		//g_ConstantBufferData.Projection	= XMMatrixPerspectiveLH(static_cast<float>(g_Width), static_cast<float>(g_Height), 1.0f, 1000.0f);
-		g_ConstantBufferData.Projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 100.0f);
+		//g_ConstantBufferData.Projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 100.0f);
 		//g_ConstantBufferData.Material	= mat;
 		//g_ConstantBufferData.Light		= light;
 		//g_ConstantBufferData.Camera		= {}; // reserved
-		*/
 
 		g_ConstantBufferData = XMMatrixIdentity() * XMMatrixLookAtLH(eye, at, up) * XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 100.0f);
 
 		// GPUのメモリへコピー
 		memcpy(g_CbvDataBegin, &g_ConstantBufferData, sizeof(g_ConstantBufferData));
 	}
-	
+
 	// ルートシグネチャ
 	{
 		// ディスクリプタレンジの設定
-		//D3D12_DESCRIPTOR_RANGE range{};
-		//range.RangeType							= D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-		//range.NumDescriptors					= 1;
-		//range.BaseShaderRegister				= 0;
-		//range.RegisterSpace						= 0;
-		//range.OffsetInDescriptorsFromTableStart	= D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		D3D12_DESCRIPTOR_RANGE range[1]{};
+		/*
+		range[0].RangeType							= D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+		range[0].NumDescriptors						= 1;
+		range[0].BaseShaderRegister					= 0;
+		range[0].RegisterSpace						= 0;
+		range[0].OffsetInDescriptorsFromTableStart	= D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		*/
+
+		range[0].RangeType							= D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range[0].NumDescriptors						= 1;
+		range[0].BaseShaderRegister					= 0;
+		range[0].RegisterSpace						= 0;
+		range[0].OffsetInDescriptorsFromTableStart	= D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 		// ルートパラメータの設定
-		D3D12_ROOT_PARAMETER param{};
-		//param.ParameterType							= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		param.ParameterType							= D3D12_ROOT_PARAMETER_TYPE_CBV;
-		param.ShaderVisibility						= D3D12_SHADER_VISIBILITY_VERTEX;
-		param.Descriptor.ShaderRegister				= 0;
-		param.Descriptor.RegisterSpace				= 0;
-		//param.DescriptorTable.NumDescriptorRanges	= 1;
-		//param.DescriptorTable.pDescriptorRanges		= &range;
+		D3D12_ROOT_PARAMETER param[2]{};
+		param[0].ParameterType							= D3D12_ROOT_PARAMETER_TYPE_CBV;
+		param[0].ShaderVisibility						= D3D12_SHADER_VISIBILITY_VERTEX;
+		param[0].Descriptor.RegisterSpace				= 0;
+		param[0].Descriptor.ShaderRegister				= 0;
+
+		param[1].ParameterType							= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param[1].ShaderVisibility						= D3D12_SHADER_VISIBILITY_PIXEL;
+		param[1].DescriptorTable.NumDescriptorRanges	= 1;
+		param[1].DescriptorTable.pDescriptorRanges		= &range[0];
+
+		/*
+		D3D12_ROOT_PARAMETER param[1]{};
+		param[0].ParameterType							= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param[0].ShaderVisibility						= D3D12_SHADER_VISIBILITY_ALL;
+		param[0].DescriptorTable.NumDescriptorRanges	= 2;
+		param[0].DescriptorTable.pDescriptorRanges		= range;
+		*/
+
+		// サンプラーの設定
+		D3D12_STATIC_SAMPLER_DESC samplerDesc{};
+		samplerDesc.AddressU			= D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 横方向の繰り返し
+		samplerDesc.AddressV			= D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 縦方向の繰り返し
+		samplerDesc.AddressW			= D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 奥行きの繰り返し
+		samplerDesc.BorderColor			= D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK; // ボーダーは黒
+		samplerDesc.Filter				= D3D12_FILTER_MIN_MAG_MIP_LINEAR; // 線形補間
+		samplerDesc.MaxLOD				= D3D12_FLOAT32_MAX; // ミップマップ最大値
+		samplerDesc.MinLOD				= 0.0f; // ミップマップ最小値
+		samplerDesc.ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーから見える
+		samplerDesc.ComparisonFunc		= D3D12_COMPARISON_FUNC_NEVER; // リサンプリングしない
 
 		// ルートシグネチャの設定
 		D3D12_ROOT_SIGNATURE_DESC desc{};
-		desc.NumParameters		= 1;
-		desc.pParameters		= &param;
-		desc.NumStaticSamplers	= 0;
-		desc.pStaticSamplers	= nullptr;
+		desc.NumParameters		= _countof(param);
+		desc.pParameters		= param;
+		desc.NumStaticSamplers	= 1;
+		desc.pStaticSamplers	= &samplerDesc;
+		desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+		/*
 		desc.Flags  = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+		*/
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
@@ -808,11 +779,33 @@ void InitializeDirectX12()
 		assert(SUCCEEDED(hr));
 	}
 
-	// テクスチャの生成
+	// 頂点バッファの生成
 	{
+		// 頂点データ
+		Vertex3D vertices[] =
+		{
+			// 正面
+			{ { -0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 0.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ { -0.5f,  0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 0.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ {  0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 1.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ {  0.5f,  0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 1.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+
+			// 裏面
+			{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ {  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+
+			// 左
+			{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ {  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+			{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  },
+		};
+
 		// ヒーププロパティの設定
 		D3D12_HEAP_PROPERTIES prop{};
-		prop.Type					= D3D12_HEAP_TYPE_DEFAULT;
+		prop.Type					= D3D12_HEAP_TYPE_UPLOAD;
 		prop.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 		prop.MemoryPoolPreference	= D3D12_MEMORY_POOL_UNKNOWN;
 		prop.CreationNodeMask		= 1;
@@ -820,9 +813,117 @@ void InitializeDirectX12()
 
 		// リソースの設定
 		D3D12_RESOURCE_DESC desc{};
+		desc.Dimension			= D3D12_RESOURCE_DIMENSION_BUFFER;
+		desc.Alignment			= 0;
+		desc.Width				= sizeof(vertices);
+		desc.Height				= 1;
+		desc.DepthOrArraySize	= 1;
+		desc.MipLevels			= 1;
+		desc.Format				= DXGI_FORMAT_UNKNOWN;
+		desc.SampleDesc.Count	= 1;
+		desc.SampleDesc.Quality	= 0;
+		desc.Layout				= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
+
+		// リソースの生成
+		hr = g_Device->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&desc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&g_VertexBuffer));
+		assert(SUCCEEDED(hr));
+
+		// マップ
+		Vertex3D* pData;
+		hr = g_VertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+		assert(SUCCEEDED(hr));
+
+		// 頂点データのコピー
+		memcpy(pData, vertices, sizeof(vertices));
+
+		// アンマップ
+		g_VertexBuffer->Unmap(0, nullptr);
+
+		// 頂点バッファビューの設定
+		g_VertexBufferView.BufferLocation	= g_VertexBuffer->GetGPUVirtualAddress();
+		g_VertexBufferView.StrideInBytes	= sizeof(Vertex3D);
+		g_VertexBufferView.SizeInBytes		= sizeof(vertices);
+	}
+
+	// インデックスバッファの生成
+	{
+		uint32_t index[] =
+		{
+			   0, 1, 2, 3, 3,
+			4, 4, 5, 6, 7,
+		};
+
+		// ヒーププロパティの設定
+		D3D12_HEAP_PROPERTIES prop{};
+		prop.Type					= D3D12_HEAP_TYPE_UPLOAD;
+		prop.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference	= D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask		= 1;
+		prop.VisibleNodeMask		= 1;
+
+		// リソースの設定
+		D3D12_RESOURCE_DESC desc{};
+		desc.Dimension			= D3D12_RESOURCE_DIMENSION_BUFFER;
+		desc.Alignment			= 0;
+		desc.Width				= sizeof(index);
+		desc.Height				= 1;
+		desc.DepthOrArraySize	= 1;
+		desc.MipLevels			= 1;
+		desc.Format				= DXGI_FORMAT_UNKNOWN;
+		desc.SampleDesc.Count	= 1;
+		desc.SampleDesc.Quality	= 0;
+		desc.Layout				= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
+
+		// リソースの生成
+		hr = g_Device->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&desc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&g_IndexBuffer));
+		assert(SUCCEEDED(hr));
+
+		// マップ
+		uint32_t* pData;
+		hr = g_IndexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+		assert(SUCCEEDED(hr));
+
+		// 頂点データのコピー
+		memcpy(pData, index, sizeof(index));
+
+		// アンマップ
+		g_IndexBuffer->Unmap(0, nullptr);
+
+		// 頂点バッファビューの設定
+		g_IndexBufferView.BufferLocation	= g_IndexBuffer->GetGPUVirtualAddress();
+		g_IndexBufferView.Format			= DXGI_FORMAT_R32_UINT;
+		g_IndexBufferView.SizeInBytes		= sizeof(index);
+	}
+
+	// テクスチャの生成
+	{
+		// ヒーププロパティの設定
+		D3D12_HEAP_PROPERTIES prop{};
+		prop.Type					= D3D12_HEAP_TYPE_CUSTOM;
+		prop.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+		prop.MemoryPoolPreference	= D3D12_MEMORY_POOL_L0;
+		prop.CreationNodeMask		= 0;
+		prop.VisibleNodeMask		= 0;
+
+		// リソースの設定
+		D3D12_RESOURCE_DESC desc{};
 		desc.Dimension			= D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		desc.Width				= 16;
-		desc.Height				= 16;
+		desc.Width				= 256;
+		desc.Height				= 256;
 		desc.DepthOrArraySize	= 1;
 		desc.MipLevels			= 1;
 		desc.Format				= DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -836,41 +937,95 @@ void InitializeDirectX12()
 			&prop,
 			D3D12_HEAP_FLAG_NONE,
 			&desc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 			nullptr,
 			IID_PPV_ARGS(&g_Texture));
 		assert(SUCCEEDED(hr));
 	}
 
-	// サブリソースの更新
+	// テクスチャデータの作成
+	uint32_t pixels[256 * 256]{};
 	{
-		// テクスチャデータの生成
-		UINT32 pixels[16 * 16]{};
+		// ABGRの順で処理
+		for (UINT y = 0; y < 256; y++)
 		{
-			for (UINT y = 0; y < 16; y++)
+			for (UINT x = 0; x < 256; x++)
 			{
-				for (UINT x = 0; x < 16; x++)
+				if (y < 127 && x < 127 || y >= 128 && x >= 128)
 				{
-					if (y < 7 && x < 7 || y >= 8 && x >= 8)
-					{
-						pixels[x + y * 16] = 0xFFFFFFFF;
-					}
-					else
-					{
-						pixels[x + y * 16] = 0x000000FF;
-					}
+					pixels[x + y * 256] = 0xFFFFFFFF;
+				}
+				else
+				{
+					pixels[x + y * 256] = 0xFF000000;
 				}
 			}
 		}
+	}
 
-		// サブリソースデータの設定
-		D3D12_SUBRESOURCE_DATA subRes;
-		subRes.pData		= pixels;
-		subRes.RowPitch		= 16;
-		subRes.SlicePitch	= 16 * 16;
+	// サブリソースの更新
+	{
+		hr = g_Texture->WriteToSubresource(
+			0,
+			nullptr, // 全領域へコピー
+			pixels, // コピー元データ
+			sizeof(uint32_t) * 256, // 1ラインサイズ
+			sizeof(uint32_t) * 256 * 256); // 全サイズ
+		assert(SUCCEEDED(hr));
+	}
 
-		// サブリソースの更新
-		
+	// 定数バッファビューとシェーダーリソースビューのデスクリプターヒープを生成
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC desc{};
+		desc.Flags			= D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		desc.NodeMask		= 0;
+		desc.NumDescriptors = 2;
+		desc.Type			= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+
+		hr = g_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_CbvSrvHeap));
+		assert(SUCCEEDED(hr));
+
+		g_CbvSrvDescriptorHeapSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	// 定数バッファビューとシェーダーリソースビューのデスクリプターヒープを生成
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC desc{};
+		desc.Flags			= D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		desc.NodeMask		= 0;
+		desc.NumDescriptors = 1;
+		desc.Type			= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+
+		hr = g_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_CbvSrvHeap));
+		assert(SUCCEEDED(hr));
+
+		g_CbvSrvDescriptorHeapSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	// シェーダーリソースビューのディスクリプターヒープの生成
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC desc{};
+		desc.Flags			= D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		desc.Type			= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		desc.NumDescriptors	= 1;
+		desc.NodeMask		= 0;
+
+		hr = g_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_SrvHeap));
+		assert(SUCCEEDED(hr));
+	}
+
+	// シェーダーリソースビューの生成
+	{
+		D3D12_SHADER_RESOURCE_VIEW_DESC desc{};
+		desc.Format						= DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.Shader4ComponentMapping	= D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		desc.ViewDimension				= D3D12_SRV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MipLevels		= 1;
+
+		g_Device->CreateShaderResourceView(
+			g_Texture.Get(),
+			&desc,
+			g_SrvHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 }
 
@@ -888,13 +1043,12 @@ void FinalizeDirectX12()
 		g_RenderTargets[i].Reset();
 	}
 
-	g_DepthStencil.Reset();
-
-	g_SwapChain.Reset();
-	g_Fence.Reset();
-	g_CmdList.Reset();
-	g_CmdQueue.Reset();
-	g_Device.Reset();
+	g_DepthStencil	.Reset();
+	g_SwapChain		.Reset();
+	g_Fence			.Reset();
+	g_CmdList		.Reset();
+	g_CmdQueue		.Reset();
+	g_Device		.Reset();
 }
 
 void BeginDirectX12()
@@ -926,23 +1080,28 @@ void BeginDirectX12()
 	g_CmdAllocator->Reset();
 	g_CmdList->Reset(g_CmdAllocator.Get(), g_PipelineState.Get());
 
-	// ディスクリプタヒープを設定
-	//g_CmdList->SetDescriptorHeaps(1, g_CbvHeap.GetAddressOf());
-
-	// ルートシグネチャを設定
-	g_CmdList->SetGraphicsRootSignature(g_RootSignature.Get());
-
 	// パイプラインステートの設定
 	g_CmdList->SetPipelineState(g_PipelineState.Get());
-
-	// ディスクリプタヒープテーブルを設定
-	//g_CmdList->SetGraphicsRootDescriptorTable(0, g_CbvHeap->GetGPUDescriptorHandleForHeapStart());
 
 	// ビューポートの設定
 	g_CmdList->RSSetViewports(1, &g_Viewport);
 
 	// シザー短形
 	g_CmdList->RSSetScissorRects(1, &g_ScissorRect);
+
+
+
+	// ルートシグネチャを設定
+	g_CmdList->SetGraphicsRootSignature(g_RootSignature.Get());
+
+	// ディスクリプタヒープテーブルを設定
+	g_CmdList->SetGraphicsRootConstantBufferView(0, g_ConstantBuffer->GetGPUVirtualAddress());
+
+	g_CmdList->SetDescriptorHeaps(1, g_SrvHeap.GetAddressOf());
+	g_CmdList->SetGraphicsRootDescriptorTable(1, g_SrvHeap->GetGPUDescriptorHandleForHeapStart());
+	
+
+
 
 	// リソースバリアの設定
 	// Present ---> RenderTarget
@@ -973,17 +1132,33 @@ void BeginDirectX12()
 
 
 
+	// 定数バッファのルートシグネチャの設定
+	//g_CmdList->SetGraphicsRootSignature(g_RootSignature.Get());
+
+	// 定数バッファのディスクリプタヒープの設定
+	//g_CmdList->SetDescriptorHeaps(1, g_CbvHeap.GetAddressOf());
+
+	// 定数バッファビューの設定
+	//g_CmdList->SetGraphicsRootConstantBufferView(0, g_ConstantBuffer->GetGPUVirtualAddress());
+
+
+
+
+
+	// 頂点バッファビューの設定
+	g_CmdList->IASetVertexBuffers(0, 1, &g_VertexBufferView);
+
+	// インデックスバッファビューの設定
+	g_CmdList->IASetIndexBuffer(&g_IndexBufferView);
+
 	// プリミティブトポロジーの設定
 	g_CmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	// 定数バッファの送信
-	g_CmdList->SetGraphicsRootConstantBufferView(0, g_ConstantBuffer->GetGPUVirtualAddress());
+	// 描画コマンドの生成
+	//g_CmdList->DrawInstanced(4, 1, 0, 0);
+	g_CmdList->DrawIndexedInstanced(4, 1, 0, 0, 0);
 
-	// 頂点バッファビューを設定
-	g_CmdList->IASetVertexBuffers(0, 1, &g_VertexBufferView);
 
-	// 描画コマンドを生成
-	g_CmdList->DrawInstanced(4, 1, 0, 0);
 
 
 
