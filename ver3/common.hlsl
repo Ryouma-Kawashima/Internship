@@ -2,10 +2,10 @@
 
 struct VS_IN
 {
-    float4 Position : POSITION;
-    float4 Normal   : NORMAL;
-    float4 Diffuse  : COLOR;
+    float3 Position : POSITION;
+    float3 Normal   : NORMAL;
     float2 TexCoord : TEXCOORD;
+    float4 Diffuse  : COLOR;
 };
 
 struct PS_IN

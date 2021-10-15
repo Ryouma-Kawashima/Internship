@@ -39,10 +39,10 @@ void EndDirectX12();
 
 struct Vertex3D
 {
-	XMFLOAT4 Position;
-	XMFLOAT4 Normal;
-	XMFLOAT4 Diffuse;
+	XMFLOAT3 Position;
+	XMFLOAT3 Normal;
 	XMFLOAT2 TexCoord;
+	XMFLOAT4 Diffuse;
 };
 
 struct MATERIAL
@@ -99,8 +99,8 @@ ComPtr<ID3D12Fence>					g_Fence;						// フェンス
 
 // 定数バッファ
 ComPtr<ID3D12Resource>	g_ConstantBuffer;		// 定数バッファ
-XMMATRIX			g_ConstantBufferData;	// 定数バッファの送信する前の仮置き
-XMMATRIX*			g_CbvDataBegin;			// 定数バッファ(GPU)の仮想アドレス収納
+XMMATRIX				g_ConstantBufferData;	// 定数バッファの送信する前の仮置き
+XMMATRIX*				g_CbvDataBegin;			// 定数バッファ(GPU)の仮想アドレス収納
 
 //ComPtr<ID3D12Resource>	g_WorldBuffer;		// ワールド行列
 //ComPtr<ID3D12Resource>	g_ViewBuffer;		// ビュー行列
@@ -129,6 +129,8 @@ UINT64 g_Width	= 0;
 UINT   g_Height	= 0;
 
 float g_RotateAngle = 0;
+
+ComPtr<ID3D12Resource>	g_Texture; // テクスチャ
 
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
@@ -256,6 +258,7 @@ void WaitDrawDone()
 	// フレームバッファ番号を更新
 	g_FrameIndex = g_SwapChain->GetCurrentBackBufferIndex();
 }
+
 bool CreateBufferDiscriptorHeap(ID3D12DescriptorHeap** descriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_DESCRIPTOR_HEAP_FLAGS flag = D3D12_DESCRIPTOR_HEAP_FLAG_NONE)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC desc;
@@ -292,7 +295,7 @@ bool CreateBuffer(ID3D12Resource** resource, UINT64 size, D3D12_HEAP_TYPE type =
 	desc.Layout				= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
 
-	// リソースの作成
+	// リソースの生成
 	return SUCCEEDED(g_Device->CreateCommittedResource(
 		&prop,
 		D3D12_HEAP_FLAG_NONE,
@@ -321,7 +324,7 @@ void InitializeDirectX12()
 	g_Width		= WINDOW_WIDTH;
 	g_Height	= WINDOW_HEIGHT;
 	
-	// ファクトリーの作成
+	// ファクトリーの生成
 	ComPtr<IDXGIFactory6> factory;
 	{
 		UINT dxgiFactoryFlags = 0;
@@ -341,13 +344,13 @@ void InitializeDirectX12()
 		assert(SUCCEEDED(hr));
 	}
 
-	// デバイスの作成
+	// デバイスの生成
 	{
 		hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&g_Device));
 		assert(SUCCEEDED(hr));
 	}
 
-	// コマンドキューの作成
+	// コマンドキューの生成
 	{
 		D3D12_COMMAND_QUEUE_DESC desc{};
 		desc.Flags	= D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -357,13 +360,13 @@ void InitializeDirectX12()
 		assert(SUCCEEDED(hr));
 	}
 
-	// コマンドアロケーターの作成
+	// コマンドアロケーターの生成
 	{
 		hr = g_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&g_CmdAllocator));
 		assert(SUCCEEDED(hr));
 	}
 
-	// コマンドリストの作成
+	// コマンドリストの生成
 	{
 		hr = g_Device->CreateCommandList(
 			0,
@@ -388,13 +391,13 @@ void InitializeDirectX12()
 	}
 	*/
 
-	// フェンスの作成
+	// フェンスの生成
 	{
 		hr = g_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&g_Fence));
 		assert(SUCCEEDED(hr));
 	}
 
-	// フェンス用イベントの作成
+	// フェンス用イベントの生成
 	{
 		g_FenceValue = 1;
 		g_FenceEvent = CreateEventEx( nullptr, nullptr, 0, EVENT_ALL_ACCESS );
@@ -419,7 +422,7 @@ void InitializeDirectX12()
 		g_ScissorRect.bottom	= static_cast<long>(g_Height);
 	}
 
-	// スワップチェインの作成
+	// スワップチェインの生成
 	{
 		DXGI_SWAP_CHAIN_DESC desc{};
 		desc.BufferCount		= BUFFER_COUNT;
@@ -432,7 +435,7 @@ void InitializeDirectX12()
 		desc.SampleDesc.Count	= 1;
 		desc.Windowed			= true;
 
-		// スワップチェインの作成
+		// スワップチェインの生成
 		ComPtr<IDXGISwapChain> swapChain;
 		hr = factory->CreateSwapChain(g_CmdQueue.Get(), &desc, &swapChain);
 		assert(SUCCEEDED(hr));
@@ -445,7 +448,7 @@ void InitializeDirectX12()
 		g_FrameIndex = g_SwapChain->GetCurrentBackBufferIndex();
 	}
 
-	// レンダーターゲットビュー用ディスクリプタヒープの作成
+	// レンダーターゲットビュー用ディスクリプタヒープの生成
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc{};
 		desc.Flags			= D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -458,7 +461,7 @@ void InitializeDirectX12()
 		g_RtvDescriptorHeapSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
 
-	// レンダーターゲットビューの作成
+	// レンダーターゲットビューの生成
 	{
 		// CPUハンドルの先頭を取得
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = g_RtvHeap->GetCPUDescriptorHandleForHeapStart();
@@ -475,7 +478,7 @@ void InitializeDirectX12()
 			hr = g_SwapChain->GetBuffer(i, IID_PPV_ARGS(&g_RenderTargets[i]));
 			assert(SUCCEEDED(hr));
 
-			// レンダーターゲットビューを作成
+			// レンダーターゲットビューを生成
 			g_Device->CreateRenderTargetView(g_RenderTargets[i].Get(), &desc, handle);
 
 			// ハンドルのポインタを進める
@@ -483,7 +486,7 @@ void InitializeDirectX12()
 		}
 	}
 
-	// 深度ステンシルビュー用ディスクリプタヒープの作成
+	// 深度ステンシルビュー用ディスクリプタヒープの生成
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc{};
 		desc.Flags			= D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -496,7 +499,7 @@ void InitializeDirectX12()
 		g_DsvDescriptorHeapSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	}
 
-	// 深度ステンシルビューの作成
+	// 深度ステンシルビューの生成
 	{
 		// ヒーププロパティの設定
 		D3D12_HEAP_PROPERTIES prop{};
@@ -526,7 +529,7 @@ void InitializeDirectX12()
 		clearValue.DepthStencil.Depth	= 1.0f;
 		clearValue.DepthStencil.Stencil	= 0;
 
-		// リソースの作成
+		// リソースの生成
 		hr = g_Device->CreateCommittedResource(
 			&prop,
 			D3D12_HEAP_FLAG_NONE,
@@ -542,21 +545,22 @@ void InitializeDirectX12()
 		dsvDesc.ViewDimension	= D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Flags			= D3D12_DSV_FLAG_NONE;
 
-		// 深度ステンシルビューの作成
+		// 深度ステンシルビューの生成
 		g_Device->CreateDepthStencilView(
 			g_DepthStencil.Get(),
 			&dsvDesc,
 			g_DsvHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 
-	// 頂点バッファの作成
+	// 頂点バッファの生成
 	{
 		// 頂点データ
 		Vertex3D vertices[] =
-		{		// position						normal							color					texcoord
-			{ { -0.5f, -0.5f, 0.0f, 1.0f }, { 0.0f, 0.0f, -1.0f, 0.0f },  { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f }, },
-			{ {  0.0f,  0.5f, 0.0f, 1.0f }, { 0.0f, 0.0f, -1.0f, 0.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, },
-			{ {  0.5f, -0.5f, 0.0f, 1.0f }, { 0.0f, 0.0f, -1.0f, 0.0f },  { 0.0f, 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, }
+		{
+			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f },  { 1.0f, 0.0f, 0.0f, 1.0f }  },
+			{ { -0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f },  { 0.0f, 1.0f, 0.0f, 1.0f }  },
+			{ {  0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f },  { 0.0f, 0.0f, 1.0f, 1.0f }  },
+			{ {  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f },  { 1.0f, 1.0f, 1.0f, 1.0f }  }
 		};
 
 		// ヒーププロパティの設定
@@ -581,7 +585,7 @@ void InitializeDirectX12()
 		desc.Layout				= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 		desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
 
-		// リソースの作成
+		// リソースの生成
 		hr = g_Device->CreateCommittedResource(
 			&prop,
 			D3D12_HEAP_FLAG_NONE,
@@ -599,7 +603,7 @@ void InitializeDirectX12()
 		// 頂点データのコピー
 		//memcpy(pData, vertices, sizeof(vertices));
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			pData[i] = vertices[i];
 		}
@@ -613,21 +617,21 @@ void InitializeDirectX12()
 		g_VertexBufferView.SizeInBytes		= sizeof(vertices);
 	}
 
-	// 定数バッファ用のディスクリプターヒープの作成
+	// 定数バッファ用のディスクリプターヒープの生成
 	{
 		CreateConstantBufferDiscriptorHeap();
 	}
 
-	// 定数バッファの作成
+	// 定数バッファの生成
 	{
 		CreateConstantBuffer(&g_ConstantBuffer, 256);
 
 		// 定数バッファビューの設定
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc{};
-		desc.BufferLocation = g_ConstantBuffer->GetGPUVirtualAddress();
-		desc.SizeInBytes = 256;
+		desc.BufferLocation	= g_ConstantBuffer->GetGPUVirtualAddress();
+		desc.SizeInBytes	= 256;
 
-		// 定数バッファビューの作成
+		// 定数バッファビューの生成
 		g_Device->CreateConstantBufferView(&desc, g_CbvHeap->GetCPUDescriptorHandleForHeapStart());
 
 		// マップ (終了時までアンマップしない)
@@ -638,23 +642,24 @@ void InitializeDirectX12()
 		float aspectRatio = static_cast<float>(g_Width) / static_cast<float>(g_Height);
 
 		// ビューの設定
-		XMVECTOR eye = { 0.0f, 0.0f, -5.0f };
-		XMVECTOR at = { 0.0f, 0.0f,  0.0f };
-		XMVECTOR up = { 0.0f, 1.0f,  0.0f };
+		XMVECTOR eye	= { 0.0f, 0.0f, -5.0f };
+		XMVECTOR at		= { 0.0f, 0.0f,  0.0f };
+		XMVECTOR up		= { 0.0f, 1.0f,  0.0f };
 
-		// マテリアルの設定
-		MATERIAL mat = {};
-		mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		mat.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-		mat.Emission = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		mat.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		mat.Shininess = 0.75f;
+		// マテリアルの初期設定
+		MATERIAL mat{};
+		mat.Diffuse		= XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		mat.Ambient		= XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+		mat.Emission	= XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		mat.Specular	= XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		mat.Shininess	= 0.75f;
 
-		LIGHT light = {};
-		light.Enable = false;
-		light.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		light.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-		light.Direction = { 0.0f, -0.3f, -0.7f, 0.0f };
+		// ライトの初期設定
+		LIGHT light{};
+		light.Enable	= false;
+		light.Diffuse	= XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		light.Ambient	= XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+		light.Direction	= { 0.0f, -0.3f, -0.7f, 0.0f };
 
 		// 定数バッファデータの設定
 		/*
@@ -667,7 +672,7 @@ void InitializeDirectX12()
 		//g_ConstantBufferData.Camera		= {}; // reserved
 		*/
 
-		g_ConstantBufferData = XMMatrixIdentity() /* XMMatrixLookAtLH(eye, at, up) * XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 100.0f)*/;
+		g_ConstantBufferData = XMMatrixIdentity() * XMMatrixLookAtLH(eye, at, up) * XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 100.0f);
 
 		// GPUのメモリへコピー
 		memcpy(g_CbvDataBegin, &g_ConstantBufferData, sizeof(g_ConstantBufferData));
@@ -738,21 +743,21 @@ void InitializeDirectX12()
 		// 無効なポインタを渡さないために関数内で保持する
 		const char position[]	= "POSITION";
 		const char normal[]		= "NORMAL";
-		const char color[]		= "COLOR";
 		const char texCoord[]	= "TEXCOORD";
+		const char color[]		= "COLOR";
 
 		// 入力レイアウトの設定
 		D3D12_INPUT_ELEMENT_DESC inputElements[] = {
-			{ position,	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ normal,	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ color,	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ texCoord,	0, DXGI_FORMAT_R32G32_FLOAT,		0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+			{ position,	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ normal,	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ texCoord,	0, DXGI_FORMAT_R32G32_FLOAT,		0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ color,	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 		};
 
 		// ラスタライザーステートの設定
 		D3D12_RASTERIZER_DESC descRS{};
 		descRS.FillMode					= D3D12_FILL_MODE_SOLID;
-		descRS.CullMode					= D3D12_CULL_MODE_NONE;
+		descRS.CullMode					= D3D12_CULL_MODE_BACK;
 		descRS.FrontCounterClockwise	= false;
 		descRS.DepthBias				= D3D12_DEFAULT_DEPTH_BIAS;
 		descRS.DepthBiasClamp			= D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
@@ -798,9 +803,74 @@ void InitializeDirectX12()
 		desc.DSVFormat							= DXGI_FORMAT_D32_FLOAT;
 		desc.SampleDesc.Count					= 1;
 
-		// パイプラインステートの作成
+		// パイプラインステートの生成
 		hr = g_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&g_PipelineState));
 		assert(SUCCEEDED(hr));
+	}
+
+	// テクスチャの生成
+	{
+		// ヒーププロパティの設定
+		D3D12_HEAP_PROPERTIES prop{};
+		prop.Type					= D3D12_HEAP_TYPE_DEFAULT;
+		prop.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference	= D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask		= 1;
+		prop.VisibleNodeMask		= 1;
+
+		// リソースの設定
+		D3D12_RESOURCE_DESC desc{};
+		desc.Dimension			= D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		desc.Width				= 16;
+		desc.Height				= 16;
+		desc.DepthOrArraySize	= 1;
+		desc.MipLevels			= 1;
+		desc.Format				= DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count	= 1;
+		desc.SampleDesc.Quality	= 0;
+		desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
+		desc.Layout				= D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+		// リソースの生成
+		hr = g_Device->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&desc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&g_Texture));
+		assert(SUCCEEDED(hr));
+	}
+
+	// サブリソースの更新
+	{
+		// テクスチャデータの生成
+		UINT32 pixels[16 * 16]{};
+		{
+			for (UINT y = 0; y < 16; y++)
+			{
+				for (UINT x = 0; x < 16; x++)
+				{
+					if (y < 7 && x < 7 || y >= 8 && x >= 8)
+					{
+						pixels[x + y * 16] = 0xFFFFFFFF;
+					}
+					else
+					{
+						pixels[x + y * 16] = 0x000000FF;
+					}
+				}
+			}
+		}
+
+		// サブリソースデータの設定
+		D3D12_SUBRESOURCE_DATA subRes;
+		subRes.pData		= pixels;
+		subRes.RowPitch		= 16;
+		subRes.SlicePitch	= 16 * 16;
+
+		// サブリソースの更新
+		
 	}
 }
 
@@ -830,7 +900,7 @@ void FinalizeDirectX12()
 void BeginDirectX12()
 {
 	// 回転角を増やす
-	g_RotateAngle += (0.000001f);
+	g_RotateAngle += (0.05f);
 
 	XMVECTOR axis = { 0.0f, 0.0f, 1.0f, 0.0f };
 
@@ -838,10 +908,9 @@ void BeginDirectX12()
 	//g_ConstantBufferData.World = XMMatrixRotationAxis(axis, g_RotateAngle);
 
 	// 定数バッファを更新
-
-	XMMATRIX world = XMMatrixIdentity();
-	XMMATRIX view = XMMatrixLookAtLH({ 0, 0, -5 }, {}, { 0, 1, 0 });
-	XMMATRIX projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(g_Width) / static_cast<float>(g_Height), 0.1f, 100.0f);
+	XMMATRIX world		= XMMatrixRotationAxis(axis, g_RotateAngle);
+	XMMATRIX view		= XMMatrixLookAtLH({ 0, 0, -5 }, { 0, 0, 0 }, { 0, 1, 0 });
+	XMMATRIX projection	= XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(g_Width) / static_cast<float>(g_Height), 0.1f, 100.0f);
 
 	g_ConstantBufferData = XMMatrixTranspose(world * view * projection);
 	*g_CbvDataBegin = g_ConstantBufferData;
@@ -901,8 +970,11 @@ void BeginDirectX12()
 	// 深度ステンシルビューをクリア
 	g_CmdList->ClearDepthStencilView(handleDSV, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
+
+
+
 	// プリミティブトポロジーの設定
-	g_CmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	g_CmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	// 定数バッファの送信
 	g_CmdList->SetGraphicsRootConstantBufferView(0, g_ConstantBuffer->GetGPUVirtualAddress());
@@ -911,7 +983,10 @@ void BeginDirectX12()
 	g_CmdList->IASetVertexBuffers(0, 1, &g_VertexBufferView);
 
 	// 描画コマンドを生成
-	g_CmdList->DrawInstanced(3, 1, 0, 0);
+	g_CmdList->DrawInstanced(4, 1, 0, 0);
+
+
+
 
 	// リソースバリアの設定
 	// RenderTarget ---> Present
