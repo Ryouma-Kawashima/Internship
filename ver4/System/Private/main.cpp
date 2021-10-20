@@ -18,14 +18,12 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-#define CLASS_NAME TEXT("App Class")
-#define WINDOW_CAPTION TEXT("Window Caption")
-
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#include "../Public/config.h"
+#include "../Public/system_timer.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
+using namespace DragonLib;
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -82,7 +80,7 @@ constexpr UINT BUFFER_COUNT = 2;
 HWND		g_hWnd;
 HINSTANCE	g_hInstance;
 
-ComPtr<ID3D12Device>				g_Device;						// デバイス
+ComPtr<ID3D12Device1>				g_Device;						// デバイス
 ComPtr<ID3D12CommandQueue>			g_CmdQueue;						// コマンドキュー
 ComPtr<ID3D12CommandAllocator>		g_CmdAllocator;					// コマンドアロケーター
 ComPtr<ID3D12GraphicsCommandList>	g_CmdList;						// グラフィックスコマンドリスト
@@ -97,6 +95,7 @@ ComPtr<ID3D12Resource>				g_DepthStencil;					// デプスステンシルのバッファ
 ComPtr<ID3D12RootSignature>			g_RootSignature;				// ルートシグネチャ
 ComPtr<ID3D12PipelineState>			g_PipelineState;				// パイプラインステート
 ComPtr<ID3D12Fence>					g_Fence;						// フェンス
+ComPtr<ID3D12PipelineLibrary1>		g_PipelineLibrary;				// パイプラインライブラリ
 
 // 定数バッファ
 ComPtr<ID3D12Resource>	g_ConstantBuffer;		// 定数バッファ
@@ -673,6 +672,13 @@ void InitializeDirectX12()
 		desc.NumStaticSamplers	= 1;
 		desc.pStaticSamplers	= &samplerDesc;
 		desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+		/*
+		desc.Flags  = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+		*/
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
@@ -770,6 +776,14 @@ void InitializeDirectX12()
 		// パイプラインステートの生成
 		hr = g_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&g_PipelineState));
 		assert(SUCCEEDED(hr));
+	}
+
+	// パイプラインライブラリの生成
+	{
+		hr = g_Device->CreatePipelineLibrary(nullptr, 0, IID_PPV_ARGS(&g_PipelineLibrary));
+		assert(SUCCEEDED(hr));
+
+		
 	}
 
 	// 頂点バッファの生成
@@ -943,7 +957,7 @@ void InitializeDirectX12()
 		}
 	}
 
-	// サブリソースの更新
+	// サブリソースの書き込み
 	{
 		hr = g_Texture->WriteToSubresource(
 			0,

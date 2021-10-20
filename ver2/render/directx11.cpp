@@ -15,21 +15,21 @@ void DirectX11::Initialize(WindowAPI* window)
 
     // デバイス、スワップチェーンの作成
     DXGI_SWAP_CHAIN_DESC swapChainDesc{};
-    swapChainDesc.BufferCount = 1;
-    swapChainDesc.BufferDesc.Width = static_cast<unsigned int>(window->GetWidth());
-    swapChainDesc.BufferDesc.Height = static_cast<unsigned int>(window->GetHeight());
-    swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    swapChainDesc.BufferDesc.RefreshRate.Numerator = FPS;
-    swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-    swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-    swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapChainDesc.OutputWindow = reinterpret_cast<HWND>(window->GetHandle());
-    swapChainDesc.SampleDesc.Count = 1;
-    swapChainDesc.SampleDesc.Quality = 0;
-    swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    swapChainDesc.Windowed = true;
-    swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    swapChainDesc.BufferCount                           = 1;
+    swapChainDesc.BufferDesc.Width                      = static_cast<unsigned int>(window->GetWidth());
+    swapChainDesc.BufferDesc.Height                     = static_cast<unsigned int>(window->GetHeight());
+    swapChainDesc.BufferDesc.Format                     = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc.BufferDesc.RefreshRate.Numerator      = FPS;
+    swapChainDesc.BufferDesc.RefreshRate.Denominator    = 1;
+    swapChainDesc.BufferDesc.ScanlineOrdering           = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    swapChainDesc.BufferDesc.Scaling                    = DXGI_MODE_SCALING_UNSPECIFIED;
+    swapChainDesc.BufferUsage                           = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapChainDesc.OutputWindow                          = reinterpret_cast<HWND>(window->GetHandle());
+    swapChainDesc.SampleDesc.Count                      = 1;
+    swapChainDesc.SampleDesc.Quality                    = 0;
+    swapChainDesc.SwapEffect                            = DXGI_SWAP_EFFECT_DISCARD;
+    swapChainDesc.Windowed                              = true;
+    swapChainDesc.Flags                                 = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     D3D_FEATURE_LEVEL featureLevels[] =
     {
@@ -45,12 +45,11 @@ void DirectX11::Initialize(WindowAPI* window)
         D3D_DRIVER_TYPE_SOFTWARE,
     };
 
-
     for (int i = 0; i < 4; i++)
     {
         hr = D3D11CreateDeviceAndSwapChain(
             nullptr,
-            D3D_DRIVER_TYPE_HARDWARE,
+            driverType[i],
             nullptr,
             0,
             featureLevels,
@@ -139,9 +138,9 @@ void DirectX11::Initialize(WindowAPI* window)
     blendDesc.AlphaToCoverageEnable = false;
     blendDesc.IndependentBlendEnable = false;
     blendDesc.RenderTarget[0].BlendEnable = true;
-    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].SrcBlend      = D3D11_BLEND_SRC_ALPHA;
+    blendDesc.RenderTarget[0].DestBlend     = D3D11_BLEND_INV_SRC_ALPHA;
+    blendDesc.RenderTarget[0].BlendOp       = D3D11_BLEND_OP_ADD;
     blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
     blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
     blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
