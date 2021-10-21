@@ -18,12 +18,14 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-#include "../Public/config.h"
-#include "../Public/system_timer.h"
+#define CLASS_NAME TEXT("App Class")
+#define WINDOW_CAPTION TEXT("Window Caption")
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
-using namespace DragonLib;
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -80,7 +82,7 @@ constexpr UINT BUFFER_COUNT = 2;
 HWND		g_hWnd;
 HINSTANCE	g_hInstance;
 
-ComPtr<ID3D12Device1>				g_Device;						// デバイス
+ComPtr<ID3D12Device>				g_Device;						// デバイス
 ComPtr<ID3D12CommandQueue>			g_CmdQueue;						// コマンドキュー
 ComPtr<ID3D12CommandAllocator>		g_CmdAllocator;					// コマンドアロケーター
 ComPtr<ID3D12GraphicsCommandList>	g_CmdList;						// グラフィックスコマンドリスト
@@ -95,19 +97,18 @@ ComPtr<ID3D12Resource>				g_DepthStencil;					// デプスステンシルのバッファ
 ComPtr<ID3D12RootSignature>			g_RootSignature;				// ルートシグネチャ
 ComPtr<ID3D12PipelineState>			g_PipelineState;				// パイプラインステート
 ComPtr<ID3D12Fence>					g_Fence;						// フェンス
-ComPtr<ID3D12PipelineLibrary1>		g_PipelineLibrary;				// パイプラインライブラリ
 
 // 定数バッファ
 ComPtr<ID3D12Resource>	g_ConstantBuffer;		// 定数バッファ
 XMMATRIX				g_ConstantBufferData;	// 定数バッファの送信する前の仮置き
 XMMATRIX*				g_CbvDataBegin;			// 定数バッファ(GPU)の仮想アドレス収納
 
-//ComPtr<ID3D12Resource>	g_WorldBuffer;		// ワールド行列
-//ComPtr<ID3D12Resource>	g_ViewBuffer;		// ビュー行列
-//ComPtr<ID3D12Resource>	g_ProjectionBuffer;	// プロジェクション行列
-//ComPtr<ID3D12Resource>	g_MaterialBuffer;	// マテリアル
-//ComPtr<ID3D12Resource>	g_LightBuffer;		// ライト
-//ComPtr<ID3D12Resource>	g_CameraBuffer;		// カメラ座標
+ComPtr<ID3D12Resource>	g_WorldBuffer;		// ワールド行列
+ComPtr<ID3D12Resource>	g_ViewBuffer;		// ビュー行列
+ComPtr<ID3D12Resource>	g_ProjectionBuffer;	// プロジェクション行列
+ComPtr<ID3D12Resource>	g_MaterialBuffer;	// マテリアル
+ComPtr<ID3D12Resource>	g_LightBuffer;		// ライト
+ComPtr<ID3D12Resource>	g_CameraBuffer;		// カメラ座標
 
 // 頂点バッファ
 ComPtr<ID3D12Resource>		g_VertexBuffer;		// 頂点バッファ
@@ -319,6 +320,17 @@ bool CreateConstantBuffer(ID3D12Resource** resource, UINT64 size)
 {
 	return CreateBuffer(resource, size, D3D12_HEAP_TYPE_UPLOAD);
 }
+bool CreateConstantBufferView(ID3D12Resource** resource)
+{
+	// 定数バッファビューの設定
+	D3D12_CONSTANT_BUFFER_VIEW_DESC desc{};
+	desc.BufferLocation = g_ConstantBuffer->GetGPUVirtualAddress();
+	desc.SizeInBytes = 256;
+
+	// 定数バッファビューの生成
+	g_Device->CreateConstantBufferView(&desc, g_CbvHeap->GetCPUDescriptorHandleForHeapStart());
+	return true;
+}
 
 void InitializeDirectX12()
 {
@@ -383,17 +395,6 @@ void InitializeDirectX12()
 		hr = g_CmdList->Close();
 		assert(SUCCEEDED(hr));
 	}
-
-	// コマンドリストとアロケーターのリセット
-	/*
-	{
-		hr = g_CmdAllocator->Reset();
-		assert(SUCCEEDED(hr));
-
-		hr = g_CmdList->Reset(g_CmdAllocator.Get(), g_PipelineState.Get());
-		assert(SUCCEEDED(hr));
-	}
-	*/
 
 	// フェンスの生成
 	{
@@ -564,6 +565,11 @@ void InitializeDirectX12()
 	// 定数バッファの生成
 	{
 		CreateConstantBuffer(&g_ConstantBuffer, 256);
+		//CreateConstantBuffer(&g_WorldBuffer,		256);
+		//CreateConstantBuffer(&g_ViewBuffer,			256);
+		//CreateConstantBuffer(&g_ProjectionBuffer,	256);
+		//CreateConstantBuffer(&g_MaterialBuffer,		256);
+		//CreateConstantBuffer(&g_LightBuffer,		256);
 
 		// 定数バッファビューの設定
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc{};
@@ -672,13 +678,6 @@ void InitializeDirectX12()
 		desc.NumStaticSamplers	= 1;
 		desc.pStaticSamplers	= &samplerDesc;
 		desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-		/*
-		desc.Flags  = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-					| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-					| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-					| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
-					| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-		*/
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
@@ -776,14 +775,6 @@ void InitializeDirectX12()
 		// パイプラインステートの生成
 		hr = g_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&g_PipelineState));
 		assert(SUCCEEDED(hr));
-	}
-
-	// パイプラインライブラリの生成
-	{
-		hr = g_Device->CreatePipelineLibrary(nullptr, 0, IID_PPV_ARGS(&g_PipelineLibrary));
-		assert(SUCCEEDED(hr));
-
-		
 	}
 
 	// 頂点バッファの生成
@@ -957,7 +948,7 @@ void InitializeDirectX12()
 		}
 	}
 
-	// サブリソースの書き込み
+	// サブリソースの更新
 	{
 		hr = g_Texture->WriteToSubresource(
 			0,

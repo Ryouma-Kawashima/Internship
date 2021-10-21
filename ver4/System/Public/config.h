@@ -11,6 +11,8 @@ namespace DragonLib
 
     #define RENDERER_TYPE DIRECTX_12
 
+    constexpr u32 BUFFER_COUNT = 2;
+
     // Window
     constexpr TCHAR CLASS_NAME[]        = _T("App Class");
     constexpr TCHAR WINDOW_CAPTION[]    = _T("Window Caption");

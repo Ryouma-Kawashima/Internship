@@ -10,7 +10,7 @@ struct VS_IN
 
 struct PS_IN
 {
-    float4 Position         : SV_POSITION;
+    float4 Position         : SV_Position;
     float4 WorldPosition    : POSITION;
     float4 Normal           : NORMAL;
     float4 Diffuse          : COLOR;
@@ -37,7 +37,7 @@ struct LIGHT
 };
 
 /*
-cbuffer ConsntantBuffer : register(b1)
+cbuffer ConsntantBuffer : register(b0)
 {
     matrix World        : packoffset(c0);
     matrix View         : packoffset(c4);

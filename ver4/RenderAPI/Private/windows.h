@@ -9,3 +9,9 @@
 
 #include <windows.h>
 #pragma comment(lib, "winmm.lib")
+
+#ifdef interface
+#undef interface
+#endif
+
+#define interface _declspec(novtable) struct

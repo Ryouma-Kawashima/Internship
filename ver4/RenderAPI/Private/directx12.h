@@ -10,7 +10,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-#include "common.h"
+#include "../Public/common.h"
 #include "windows.h"
 
 namespace DragonLib

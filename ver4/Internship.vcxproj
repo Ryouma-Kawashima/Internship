@@ -167,7 +167,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="System\Private\main.cpp" />
+    <ClCompile Include="App\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Public\float2.h" />
@@ -176,15 +176,16 @@
     <ClInclude Include="Math\Public\math.h" />
     <ClInclude Include="Math\Public\matrix.h" />
     <ClInclude Include="Math\Public\vector.h" />
-    <ClInclude Include="RenderAPI\Private\config.h" />
     <ClInclude Include="System\Public\config.h" />
     <ClInclude Include="RenderAPI\Private\directx11.h" />
     <ClInclude Include="RenderAPI\Private\directx12.h" />
     <ClInclude Include="System\Public\include.h" />
     <ClInclude Include="System\Public\system_timer.h" />
+    <ClInclude Include="Utility\Public\allocator.h" />
+    <ClInclude Include="Utility\Public\macro.h" />
     <ClInclude Include="Utility\Public\parameter.h" />
     <ClInclude Include="RenderAPI\Public\render_api.h" />
-    <ClInclude Include="RenderAPI\Private\common.h" />
+    <ClInclude Include="RenderAPI\Public\common.h" />
     <ClInclude Include="RenderAPI\Private\windows.h" />
     <ClInclude Include="Utility\Public\singleton.h" />
     <ClInclude Include="Utility\Public\timer.h" />
