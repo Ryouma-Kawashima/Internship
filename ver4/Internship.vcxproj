@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\main.cpp" />
+    <ClCompile Include="App\old_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Public\float2.h" />
@@ -176,12 +177,21 @@
     <ClInclude Include="Math\Public\math.h" />
     <ClInclude Include="Math\Public\matrix.h" />
     <ClInclude Include="Math\Public\vector.h" />
+    <ClInclude Include="RHI\Common\buffer.h" />
     <ClInclude Include="RHI\Common\command_buffer.h" />
+    <ClInclude Include="RHI\Common\depth_stencil_view.h" />
     <ClInclude Include="RHI\Common\device.h" />
+    <ClInclude Include="RHI\Common\fence.h" />
+    <ClInclude Include="RHI\Common\render_target_view.h" />
     <ClInclude Include="RHI\Common\rhi.h" />
     <ClInclude Include="RHI\Common\swap_chain.h" />
     <ClInclude Include="RHI\Common\util.h" />
+    <ClInclude Include="RHI\DirectX11\device.h" />
+    <ClInclude Include="RHI\DirectX11\rhi.h" />
+    <ClInclude Include="RHI\DirectX11\util.h" />
     <ClInclude Include="RHI\DirectX12\device.h" />
+    <ClInclude Include="RHI\DirectX12\rhi.h" />
+    <ClInclude Include="RHI\DirectX12\util.h" />
     <ClInclude Include="System\Public\config.h" />
     <ClInclude Include="RenderAPI\Private\directx11.h" />
     <ClInclude Include="RenderAPI\Private\directx12.h" />
