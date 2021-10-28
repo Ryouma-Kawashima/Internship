@@ -51,12 +51,11 @@ void DirectX11::Initialize(Window* window)
         D3D_DRIVER_TYPE_SOFTWARE,
     };
 
-
     for (int i = 0; i < 4; i++)
     {
         hr = D3D11CreateDeviceAndSwapChain(
             nullptr,
-            D3D_DRIVER_TYPE_HARDWARE,
+            driverType[i],
             nullptr,
             0,
             featureLevels,

@@ -5,7 +5,7 @@
 
 namespace DragonLib
 {
-    enum class Format : u8
+    enum class RHIFormat : u8
     {
         R8,
         R8G8,
@@ -27,7 +27,7 @@ namespace DragonLib
     {
         const char* SemanticName;
         u32         SemanticIndex;
-        Format      InputFormat;
+        RHIFormat      InputFormat;
     };
 
     using Vertex    = Float3;
@@ -64,51 +64,6 @@ namespace DragonLib
         u32     elemHeightCount;
     };
 
-    struct Texture2D : public Resource
-    {
-        void Create(u32 width, u32 height)
-        {
-            bufferLocation  = reinterpret_cast<u8*>(new Color[height * width]);
-            elemSize        = sizeof(Color);
-            elemWidthCount  = width;
-            elemHeightCount = height;
-        }
-        Color* GetData()
-        {
-            return reinterpret_cast<Color*>(bufferLocation);
-        }
-    };
-
-    struct VertexBuffer : public Resource
-    {
-        void Create(u32 count)
-        {
-            bufferLocation  = reinterpret_cast<u8*>(new Vertex[count]);
-            elemSize        = sizeof(Vertex);
-            elemWidthCount  = count;
-            elemHeightCount = 1;
-        }
-        Vertex* GetData()
-        {
-            return reinterpret_cast<Vertex*>(bufferLocation);
-        }
-    };
-
-    struct IndexBuffer : public Resource
-    {
-        void Create(u32 count)
-        {
-            bufferLocation  = reinterpret_cast<u8*>(new Index[count]);
-            elemSize        = sizeof(Index);
-            elemWidthCount  = count;
-            elemHeightCount = 1;
-        }
-        Index* GetData()
-        {
-            return reinterpret_cast<Index*>(bufferLocation);
-        }
-    };
-
     class _declspec(novtable) Renderer
     {
     public:
@@ -119,15 +74,15 @@ namespace DragonLib
         virtual void End()      = 0;
         virtual void Present()  = 0;
 
-        virtual void CreateVertexBuffer(VertexBuffer* out, void* vertices, size_t elemSize, u32 elemCount) = 0;
+        virtual void CreateVertexBuffer(VertexBuffer** out, void* vertices, size_t elemSize, u32 elemCount) = 0;
         virtual void RemoveVertexBuffer(VertexBuffer* in) = 0;
         virtual void SetVertexBuffer(VertexBuffer* in) = 0;
 
-        virtual void CreateIndexBuffer(IndexBuffer* out, void* indices, size_t elemSize, u32 elemCount) = 0;
+        virtual IndexBuffer* CreateIndexBuffer(void* indices, size_t elemSize, u32 elemCount) = 0;
         virtual void RemoveIndexBuffer(IndexBuffer* in) = 0;
         virtual void SetIndexBuffer(IndexBuffer* in) = 0;
 
-        virtual void CreateTexture2D(Texture2D* out, void* textureData, size_t elemSize, u32 elemWidth, u32 elemHeight) = 0;
+        virtual Texture2D* CreateTexture2D(void* textureData, size_t elemSize, u32 elemWidth, u32 elemHeight) = 0;
         virtual void RemoveTexture2D(Texture2D* in) = 0;
         virtual void SetTexture2D(Texture2D* in) = 0;
 

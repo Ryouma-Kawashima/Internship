@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -176,6 +176,12 @@
     <ClInclude Include="Math\Public\math.h" />
     <ClInclude Include="Math\Public\matrix.h" />
     <ClInclude Include="Math\Public\vector.h" />
+    <ClInclude Include="RHI\Common\command_buffer.h" />
+    <ClInclude Include="RHI\Common\device.h" />
+    <ClInclude Include="RHI\Common\rhi.h" />
+    <ClInclude Include="RHI\Common\swap_chain.h" />
+    <ClInclude Include="RHI\Common\util.h" />
+    <ClInclude Include="RHI\DirectX12\device.h" />
     <ClInclude Include="System\Public\config.h" />
     <ClInclude Include="RenderAPI\Private\directx11.h" />
     <ClInclude Include="RenderAPI\Private\directx12.h" />
